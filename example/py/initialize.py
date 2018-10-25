@@ -7,13 +7,13 @@ import ccxt
 import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from setup import Transactions, Base
+from py.setup import Transactions, Base
 
 # BTC, ETH, XRP, LTC coins to start
 coins = ['BTC','ETH','XRP','LTC']
 
 # Date range - use median of starting mcap / ending mcap
-hist_cap = pd.read_csv('../data/historical_market_cap.csv')
+hist_cap = pd.read_csv('data/historical_market_cap.csv')
 hist_cap = np.array(hist_cap)
 
 start_dates = hist_cap[:len(hist_cap) - 365]
@@ -24,7 +24,6 @@ if len(cap_diffs) % 2 == 0:
 	cap_diffs.pop(len(cap_diffs) - 1)
 
 # Start date for simulations
-#start_date = cap_diffs.index(np.median(cap_diffs))
 start_date = 0
 
 hist_prices = pd.read_csv('../data/historical_prices.csv')

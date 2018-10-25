@@ -30,7 +30,7 @@ class Transactions(Base):
 
 # Create an engine that stores the database
 db = 'transactions.db'
-engine = create_engine('sqlite:///../data/' + db)
+engine = create_engine('sqlite:///data/' + db)
 
 # Create all tables in the engine. This is equivalent to "Create Table"
 # statements in raw SQL.

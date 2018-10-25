@@ -3,6 +3,8 @@ Want to automatically rebalance your personal cryptocurrency portfolio?  This
 repository ensures that your cryptocurrencies maintain an equal dollar value
 AND documents every transaction into a SQL database.
 
+__IN PROGRESS: webpage that shows your portfolio summary with some neat charts.__
+
 
 ## Steps to setup
 1. Modify api.txt with your personal API key and secret
