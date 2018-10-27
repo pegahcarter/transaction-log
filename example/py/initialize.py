@@ -7,13 +7,13 @@ import ccxt
 import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from py.setup import Transactions, Base
+from setup import Transactions, Base
 
 # BTC, ETH, XRP, LTC coins to start
 coins = ['BTC','ETH','XRP','LTC']
 
 # Date range - use median of starting mcap / ending mcap
-hist_cap = pd.read_csv('data/historical_market_cap.csv')
+hist_cap = pd.read_csv('../data/historical_market_cap.csv')
 hist_cap = np.array(hist_cap)
 
 start_dates = hist_cap[:len(hist_cap) - 365]
@@ -53,7 +53,6 @@ for i in range(len(coins)):
 	coin = coins[i]
 
 	session.add(Transactions(
-		rebalance_num = 0,
 		date = purchase_date,
 		coin = coin,
 		side = 'buy',

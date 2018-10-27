@@ -10,7 +10,6 @@ class Transactions(Base):
 	__tablename__ = 'transactions'
 
 	trade_num = Column(Integer, primary_key=True)
-	rebalance_num = Column(Integer)
 	date = Column(DateTime, default=datetime.datetime.utcnow)
 	coin = Column(String(10))
 	side = Column(String(10))
@@ -30,7 +29,7 @@ class Transactions(Base):
 
 # Create an engine that stores the database
 db = 'transactions.db'
-engine = create_engine('sqlite:///data/' + db)
+engine = create_engine('sqlite:///C:/Users/Carter/Documents/GitHub/rebalance-my-portfolio/example/data/' + db)
 
 # Create all tables in the engine. This is equivalent to "Create Table"
 # statements in raw SQL.
