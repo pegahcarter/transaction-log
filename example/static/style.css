@@ -1,0 +1,14 @@
+body {
+	padding: 80px;
+}
+
+td, th {
+	padding: 1px 4px;
+	border: 1px black solid;
+	width: 75px;
+	font-size: 10px
+}
+
+#portfolioSummary {
+	padding-bottom: 200px;
+}

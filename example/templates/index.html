@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+	<!-- Top container for table summarizing portfolio, and the chart to show % change in current value-->
+	<div id="portfolioSummary">
+	  <table>
+	    <thead class="portfolioTableHead">
+	      <tr>
+	        <th scope="col">Coin</th>
+	        <th scope="col">Current Price ($)</th>
+	        <th scope="col">Units</th>
+					<th scope="col">Cost ($)</th>
+					<th scope="col">Cost/Unit ($)</th>
+					<th scope="col">Unrealised Pct (%)</th>
+					<th scope="col">Unrealised Dollars ($)</th>
+					<th scope="col">Realised Dollars ($)</th>
+					<th scope="col">Gain/Loss ($)</th>
+					<th scope="col">Market Value</th>
+	      </tr>
+	    </thead>
+	    <tbody class="portfolioTableBody">
+				<!-- Insert coin summary data here-->
+			</tbody>
+	  </table>
+	</div>
+
+	<!-- Bottom container for table showing transactions for selected coin above-->
+	<div id="coinSummary">
+		<table>
+	    <thead>
+	      <tr>
+	        <th scope="col">Trade #</th>
+	        <th scope="col">Date</th>
+	        <th scope="col">Coin</th>
+					<th scope="col">Side</th>
+					<th scope="col">Units</th>
+					<th scope="col">Coin Price ($)</th>
+					<th scope="col">Fees ($)</th>
+					<th scope="col">Previous Units</th>
+					<th scope="col">Cumulative Units</th>
+					<th scope="col">Transacted Value ($)</th>
+					<th scope="col">Previous Cost ($)</th>
+					<th scope="col">Cost of Transaction ($)</th>
+					<th scope="col">Cost/Unit ($)</th>
+					<th scope="col">Gain/Loss From Sale</th>
+					<th scope="col">Realised Gain/Loss (%)</th>
+	      </tr>
+			</thead>
+			<tbody>
+				<!-- Insert coin transactions data here-->
+			</tbody>
+		</table>
+	</div>
+	<script src="{{ url_for('static', filename='tableSummary.js') }}" charset="utf-8"></script>
+</body>
+</html>

@@ -52,18 +52,17 @@ purchase_date = datetime.datetime.fromtimestamp(dates[0])
 
 coin_amts = amt_each / starting_prices
 
-db = 'transactions.db'
-
+# connect to db first
+engine = create_engine('sqlite:////Users/Carter/Documents/Github/rebalance-my-portfolio/example/data/transactions.db')
+Base.metadata.bind = engine
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
+query = ''' SELECT * FROM transactions'''
 
 for day in range(1, len(hist_prices)):
 	date = datetime.datetime.fromtimestamp(dates[day])
 	while True:
-		# connect to db first
-		engine = create_engine('sqlite:////Users/Carter/Documents/Github/rebalance-my-portfolio/example/data/' + db)
-		Base.metadata.bind = engine
-		DBSession = sessionmaker(bind=engine)
-		session = DBSession()
-		query = ''' SELECT * FROM transactions'''
+
 		transactions = pd.read_sql(sql=query, con=engine)
 
 		# Declaring variables
@@ -78,24 +77,22 @@ for day in range(1, len(hist_prices)):
 		if weighted_thresh > min(weight_diffs):
 			break
 
-		d_amt = weight_to_move + d_vals_total
+		d_amt = weight_to_move * d_vals_total
 		trade_sides = ['buy','sell']
 		trade_coins = [coins[l_index], coins[h_index]]
 
-		fees += d_amt * rate
-		# pretend we perfectly swap the coins and don't need a BTC intermediary trade
-		# which side is which for the ticker
+ 		# pretend we perfectly swap the coins and don't need a BTC intermediary trade
 		# ASSUMPTION: trade rate will always be .0025, which means there's a perfect ratio
 		# If we have to convert to BTC first, two trades will be executed, a.k.a. 0.005
 
 		# the ratio of buy/sell will never matter
-		# BECAUSE WE WILL ALWAYS BE BUYING THE (NOT LOWER WEIGHT) BUT COIN WITH THE
+		# BECAUSE WE WILL ALWAYS BE BUYING THE (NOT LOWER WEIGHT) BUT COIN OF
 		# LOWEST WEIGHT, AND SELLING THE COIN OF HEAVIEST WEIGHT
 		# Sell h_index(or coin with most weight)/buy l_index(or coin with least weight)
 
 		# Get coin quantities to buy/sell based on current market price
 		l_quantity = d_amt / hist_prices[day, l_index]
-		h_quantity = d_amt / hist_prices[day, h_index] * (1 + rate)
+		h_quantity = d_amt / hist_prices[day, h_index]
 		trade_quantities = [l_quantity, h_quantity]
 
 		# Adjust coin quantities
@@ -108,6 +105,7 @@ for day in range(1, len(hist_prices)):
 			temp = transactions.loc[transactions['coin'] == coin]
 			previous_units = temp['cumulative_units'].values[len(temp)-1]
 			previous_cost = temp['cumulative_cost'].values[len(temp)-1]
+
 			if side == 'buy':
 				transacted_value = d_amt * (1 + .0075)
 				cumulative_cost = previous_cost + transacted_value
@@ -116,20 +114,21 @@ for day in range(1, len(hist_prices)):
 				cost_of_transaction, cost_per_unit, gain_loss, realised_pct = None, None, None, None
 			else:
 				transacted_value = d_amt * (1 - .0075)
+				cost_of_transaction = quantity / previous_units * previous_cost
+				cost_per_unit = previous_cost / previous_units
+
 				cumulative_cost = previous_cost - transacted_value
 				cumulative_units = previous_units - quantity
-				cost_of_transaction = previous_cost * quantity/previous_units
-				cost_per_unit = previous_cost / previous_units
 				gain_loss = transacted_value - cost_of_transaction
 				realised_pct = gain_loss / cost_of_transaction
 
-				# push to SQL
+			# push to SQL
 			session.add(Transactions(
 				date = date,
 				coin = coin,
 				side = side,
 				units = quantity,
-				price_per_unit = d_amt / quantity,
+				price_per_unit = hist_prices[day, coins.index(coin)],
 				fees = d_amt * .0075,
 				previous_units = previous_units,
 				cumulative_units = cumulative_units,
@@ -143,74 +142,4 @@ for day in range(1, len(hist_prices)):
 			))
 			session.commit()
 
-
-
-
-
-transactions[3000:3005]
-
-
-# Connect to our SQL database
-db = 'transactions.db'
-engine = create_engine('sqlite:////Users/Carter/Documents/Administrative/' + db)
-Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
-
-query = ''' SELECT * FROM transactions'''
-transactions = pd.read_sql(sql=query, con=engine)
-
-rebalance_num = transactions['rebalance_num'].max() + 1
-
-
-n = 1/(len(coins))
-thresh = .02
-i = 0
-
-while True:
-
-	quantities, dollar_values = [], []
-	for coin in coins:
-		quantity = balance[coin]['total']
-		quantities.append(quantity)
-		dollar_values.append(quantity * coin_price(exchange, coin))
-
-	quantities = np.array(quantities)
-	dollar_values = np.array(dollar_values)
-
-	if (dollar_values.max() - dollar_values.min()) / dollar_values.sum() < 2 * n * thresh:
-		break
-
-	# Determine if there's a trade ratio between the coins, or if we need to convert to BTC first
-	tickers = determine_ticker(exchange, coins[dollar_values.argmin()], coins[dollar_values.argmax()])
-
-	# Reference so that BTC won't be documented in the dual trade.
-	if len(tickers) > 2:
-		dual_trade = True
-	else:
-		dual_trade = False
-
-	weight_to_move = min([dollar_values.max()/dollar_values.sum() - n, n - dollar_values.min()/dollar_values.sum()])
-	trade_dollars = weight_to_move * dollar_values.sum()
-
-	for x in range(0,len(tickers),2):
-		ratio = tickers[x]
-		trade_coins = ratio.split('/')
-
-		side = tickers[x+1]
-		if side == 'sell':
-			trade_sides = ['sell', 'buy']
-		else:
-			trade_sides = ['buy', 'sell']
-
-		# Easier way to reference both coins in our dollar_values list at the same time
-		indices = [coins.index(trade_coins[0]), coins.index(trade_coins[1])]
-		trade_quantities = trade_dollars / (dollar_values[indices] / quantities[indices])
-
-		# Make trade with quantity of numerator
-		exchange.create_order(ratio, 'market', side, trade_quantities[0])
-
-		# Update SQL database
-		# transactions = Update(dual_trade, trade_coins, trade_sides, trade_quantities, transactions, session)
-
-print('Rebalance complete.')
+transactions.loc[transactions['previous_cost'] < 100]
