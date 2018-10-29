@@ -2,7 +2,6 @@ import os
 import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -11,7 +10,7 @@ class Transactions(Base):
 	__tablename__ = 'transactions'
 
 	trade_num = Column(Integer, primary_key=True)
-	date = Column(DateTime, default=datetime.datetime.utcnow)
+	date = Column(DateTime)
 	coin = Column(String(10))
 	side = Column(String(10))
 	units = Column(Float(10,2))
@@ -27,31 +26,11 @@ class Transactions(Base):
 	gain_loss = Column(Float(10,2))
 	realised_pct = Column(Float(10,2))
 
-	def __init__(self):
-		self.trade_num = trade_num
-		self.date = date
-		self.coin = coin
-		self.side = side
-		self.units = units
-		self.price_per_unit = price_per_unit
-		self.fees = fees
-		self.previous_units = previous_units
-		self.cumulative_units = cumulative_units
-		self.transacted_value = transacted_value
-		self.previous_cost = previous_cost
-		self.cost_of_transaction = cost_of_transaction
-		self.cost_per_unit = cost_per_unit
-		self.cumulative_cost = cumulative_cost
-		self.gain_loss = gain_loss
-		self.realised_pct = realised_pct
-
-	def __repr__(self):
-		return('<Transactions %r>' % (self.trade_num))
 
 # Create an engine that stores the database
 db = 'transactions.db'
-engine = create_engine('sqlite:////C:/Users/Carter/Documents/GitHub/rebalance-my-portfolio/example/data/' + db)
+engine = create_engine('sqlite:///' + db)
 
 # Create all tables in the engine. This is equivalent to "Create Table"
 # statements in raw SQL.
-# Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)

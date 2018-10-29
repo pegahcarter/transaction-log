@@ -1,5 +1,27 @@
-// When the browser loads, load table
-$(function() {
-	var coinData = {{ data | safe }};
-	console.log(coinData);
+d3.selectAll('.yellow').style("background", "PaleGoldenrod");
+d3.selectAll('.blue').style("background", "LightBlue");
+
+
+d3.selectAll('.redgreenLight').each(function() {
+	var tableElement = d3.select(this);
+	if (tableElement.text() == " buy ") {
+		tableElement.style("background", "YellowGreen");
+	} else {
+		tableElement.style("background", "IndianRed");
+	}
+});
+
+
+d3.selectAll('.redgreenHeavy').each(function() {
+	tableElement = d3.select(this);
+	if (tableElement.text() == 0) {
+		tableElement.style("background", "LightBlue");
+	} else {
+		tableElement.style("color", "white");
+		if (tableElement.text() > 0) {
+			tableElement.style("background", "Green");
+		} else {
+			tableElement.style("background", "FireBrick");
+		}
+	}
 });

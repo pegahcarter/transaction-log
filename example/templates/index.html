@@ -33,14 +33,15 @@
 	      </tr>
 	    </thead>
 	    <tbody class="portfolioTableBody">
+
 				<!-- Insert coin summary data here-->
 			</tbody>
 	  </table>
 	</div>
 
 	<!-- Bottom container for table showing transactions for selected coin above-->
-	<div id="coinSummary">
-		<table>
+	<div>
+		<table id="transactions">
 	    <thead>
 	      <tr>
 	        <th scope="col">Trade #</th>
@@ -56,12 +57,35 @@
 					<th scope="col">Previous Cost ($)</th>
 					<th scope="col">Cost of Transaction ($)</th>
 					<th scope="col">Cost/Unit ($)</th>
-					<th scope="col">Gain/Loss From Sale</th>
+					<th scope="col">Cumulative Cost ($)</th>
+					<th scope="col">Gain/Loss From Sale ($)</th>
 					<th scope="col">Realised Gain/Loss (%)</th>
 	      </tr>
 			</thead>
 			<tbody>
 				<!-- Insert coin transactions data here-->
+				{% block content %}
+					{% for transaction in transactions %}
+						<tr class={{ transaction.coin }}>
+							<td class="yellow"> {{ transaction.trade_num }} </td>
+							<td class="yellow"> {{ transaction.date.strftime("%Y-%m-%d") }} </td>
+							<td class="yellow"> {{ transaction.coin }} </td>
+							<td class="redgreenLight"> {{ transaction.side }} </td>
+							<td class="yellow"> {{ "%.2f" | format(transaction.units) }} </td>
+							<td class="yellow"> {{ "%.2f" | format(transaction.price_per_unit) }} </td>
+							<td class="yellow"> {{ "%.2f" | format(transaction.fees) }} </td>
+							<td class="blue"> {{ "%.2f" | format(transaction.previous_units) }} </td>
+							<td class="blue"> {{ "%.2f" | format(transaction.cumulative_units) }} </td>
+							<td class="blue"> {{ "%.2f" | format(transaction.transacted_value) }} </td>
+							<td class="blue"> {{ "%.2f" | format(transaction.previous_cost) }} </td>
+							<td class="blue"> {{ "%.2f" | format(transaction.cost_of_transaction) }} </td>
+							<td class="blue"> {{ "%.2f" | format(transaction.cost_per_unit) }} </td>
+							<td class="blue"> {{ "%.2f" | format(transaction.cumulative_cost) }} </td>
+							<td class="redgreenHeavy"> {{ "%.2f" | format(transaction.gain_loss) }} </td>
+							<td class="redgreenHeavy"> {{ "%.2f" | format(transaction.realised_pct * 100) }} </td>
+						</tr>
+					{% endfor %}
+				{% endblock %}
 			</tbody>
 		</table>
 	</div>

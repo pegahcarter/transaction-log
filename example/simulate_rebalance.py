@@ -7,7 +7,7 @@ import numpy as np
 import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from py.setup import Transactions, Base
+from data.setup import Transactions, Base
 
 exchange = ccxt.bittrex()
 tickers = set()
@@ -38,31 +38,27 @@ hist_prices = np.array(hist_prices[coins])
 hist_prices = hist_prices[start_date:start_date + 365]
 dates = dates[start_date:start_date + 365]
 
-
 fees = 0
 rate = 0.0075
 start_amt = 5000
 thresh = 0.01
 avg_weight = 1 / len(coins)
 weighted_thresh = (avg_weight * thresh)
+
 amt_each = start_amt / len(coins)
-
 starting_prices = hist_prices[0]
-purchase_date = datetime.datetime.fromtimestamp(dates[0])
-
 coin_amts = amt_each / starting_prices
 
-# connect to db first
-engine = create_engine('sqlite:////Users/Carter/Documents/Github/rebalance-my-portfolio/example/data/transactions.db')
-Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
-query = ''' SELECT * FROM transactions'''
-
 for day in range(1, len(hist_prices)):
-	date = datetime.datetime.fromtimestamp(dates[day])
+	purchase_date = datetime.datetime.fromtimestamp(dates[day])
 	while True:
 
+		# connect to db first
+		engine = create_engine('sqlite:////Users/Carter/Documents/Github/rebalance-my-portfolio/example/data/transactions.db')
+		Base.metadata.bind = engine
+		DBSession = sessionmaker(bind=engine)
+		session = DBSession()
+		query = ''' SELECT * FROM transactions'''
 		transactions = pd.read_sql(sql=query, con=engine)
 
 		# Declaring variables
@@ -111,7 +107,7 @@ for day in range(1, len(hist_prices)):
 				cumulative_cost = previous_cost + transacted_value
 				cumulative_units = previous_units + quantity
 				# cost_of_transaction, cost_per_unit, gain_loss, realised_pct are N/A
-				cost_of_transaction, cost_per_unit, gain_loss, realised_pct = None, None, None, None
+				cost_of_transaction, cost_per_unit, gain_loss, realised_pct = 0, 0, 0, 0
 			else:
 				transacted_value = d_amt * (1 - .0075)
 				cost_of_transaction = quantity / previous_units * previous_cost
@@ -124,7 +120,7 @@ for day in range(1, len(hist_prices)):
 
 			# push to SQL
 			session.add(Transactions(
-				date = date,
+				date = purchase_date,
 				coin = coin,
 				side = side,
 				units = quantity,
@@ -141,5 +137,8 @@ for day in range(1, len(hist_prices)):
 				realised_pct = realised_pct
 			))
 			session.commit()
+
+
+
 
 transactions.loc[transactions['previous_cost'] < 100]
