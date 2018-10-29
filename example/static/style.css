@@ -5,14 +5,17 @@ body {
 }
 
 table {
-	table-layout: fixed;
 	text-align: center;
 	vertical-align: middle;
+	width: 100%;
+}
+
+thead {
+	min-width: 100%;
+	position: relative;
 }
 
 th {
-	width: 90px;
-	border: 1px black solid;
 	font-size: 12px;
 	background-color: MidnightBlue;
 	color: Lavender;
@@ -23,9 +26,39 @@ th {
 td {
 	height: 20px;
 	font-size: 10px;
+}
+
+th, td {
 	border: 1px black solid;
 }
 
-#portfolioSummary {
+#portfolio {
 	padding-bottom: 200px;
+}
+
+#transactions {
+	display: block;
+	max-height: 400px;
+	overflow-y: auto;
+}
+
+#transactionsTable {
+	table-layout: fixed;
+	border-collapse: collapse;
+	min-width: 100%;
+}
+
+#transactionsTableBody {
+	min-width: 100%;
+	tr td {
+		display: block;
+	}
+}
+
+.yellow {
+	background: PaleGoldenrod;
+}
+
+.blue {
+	background: LightBlue;
 }

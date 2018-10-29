@@ -7,14 +7,9 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 from datetime import datetime
 import ccxt
-import random
-import string
-import httplib2
-import json
-import requests
 import numpy as np
 import pandas as pd
-import plotly
+# import plotly
 import os
 
 exchange = ccxt.binance()
@@ -67,8 +62,6 @@ def showTransactions():
 		portfolio[coin] = coin_data
 
 	transactions = Transactions.query.all()
-	#portfolio = json.dumps(portfolio)
-	#coins = json.dumps(coins)
 	return render_template('index.html', portfolio=portfolio, coins=coins, transactions=transactions)
 
 
