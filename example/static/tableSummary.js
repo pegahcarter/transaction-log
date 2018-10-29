@@ -5,9 +5,9 @@ d3.selectAll('.blue').style("background", "LightBlue");
 d3.selectAll('.redgreenLight').each(function() {
 	var tableElement = d3.select(this);
 	if (tableElement.text() == " buy ") {
-		tableElement.style("background", "YellowGreen");
+		tableElement.style("background", "LightGreen");
 	} else {
-		tableElement.style("background", "IndianRed");
+		tableElement.style("background", "LightCoral");
 	}
 });
 

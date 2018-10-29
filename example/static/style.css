@@ -13,11 +13,11 @@ table {
 th {
 	width: 90px;
 	border: 1px black solid;
-	padding: 2px 4px;
 	font-size: 12px;
 	background-color: MidnightBlue;
-	color: White;
+	color: Lavender;
 	font-weight: lighter;
+	height: 50px;
 }
 
 td {

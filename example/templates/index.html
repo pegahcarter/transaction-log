@@ -25,21 +25,35 @@
 	        <th scope="col">Units</th>
 					<th scope="col">Cost ($)</th>
 					<th scope="col">Cost/Unit ($)</th>
-					<th scope="col">Unrealised Pct (%)</th>
 					<th scope="col">Unrealised Dollars ($)</th>
+					<th scope="col">Unrealised Pct (%)</th>
 					<th scope="col">Realised Dollars ($)</th>
 					<th scope="col">Gain/Loss ($)</th>
 					<th scope="col">Market Value</th>
 	      </tr>
 	    </thead>
 	    <tbody class="portfolioTableBody">
+				<!-- Insert coin summary data here -->
+					{% for coin in coins %}
+						<tr class={{ coin }}>
+							<td> {{ coin }} </td>
+							<td> {{ "%.2f" | format(portfolio[coin]['last_price']) }} </td>
+							<td> {{ "%.2f" | format(portfolio[coin]['units']) }} </td>
+							<td> {{ "%.2f" | format(portfolio[coin]['cost']) }} </td>
+							<td> {{ "%.2f" | format(portfolio[coin]['cost_per_unit']) }} </td>
+							<td> {{ "%.2f" | format(portfolio[coin]['unrealised_amt']) }} </td>
+							<td> {{ "%.2f" | format(portfolio[coin]['unrealised_pct'] * 100) }} </td>
+							<td> {{ "%.2f" | format(portfolio[coin]['realised_amt']) }} </td>
+							<td class="redgreenHeavy"> {{ "%.2f" | format(portfolio[coin]['gain_loss']) }} </td>
+							<td> {{ "%.2f" | format(portfolio[coin]['market_val']) }} </td>
+						</tr>
+					{% endfor %}
 
-				<!-- Insert coin summary data here-->
 			</tbody>
 	  </table>
 	</div>
 
-	<!-- Bottom container for table showing transactions for selected coin above-->
+	<!-- Bottom container for table showing transactions for selected coin above -->
 	<div>
 		<table id="transactions">
 	    <thead>
@@ -64,7 +78,6 @@
 			</thead>
 			<tbody>
 				<!-- Insert coin transactions data here-->
-				{% block content %}
 					{% for transaction in transactions %}
 						<tr class={{ transaction.coin }}>
 							<td class="yellow"> {{ transaction.trade_num }} </td>
@@ -85,7 +98,6 @@
 							<td class="redgreenHeavy"> {{ "%.2f" | format(transaction.realised_pct * 100) }} </td>
 						</tr>
 					{% endfor %}
-				{% endblock %}
 			</tbody>
 		</table>
 	</div>
