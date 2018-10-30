@@ -1,20 +1,24 @@
-d3.selectAll('.redgreenLight').each(function() {
-	var tableElement = d3.select(this);
-	if (tableElement.text() == " buy ") {
-		tableElement.style("background", "LightGreen");
+$('.redgreenLight').each(function() {
+	if ($(this).text() == ' buy ') {
+		$(this).css('background', 'LightGreen');
 	} else {
-		tableElement.style("background", "LightCoral");
+		$(this).css('background', 'LightCoral');
 	}
 });
 
-d3.selectAll('.redgreenHeavy').each(function() {
-	tableElement = d3.select(this);
-	if (tableElement.text() != 0) {
-		tableElement.style("color", "white");
-		if (tableElement.text() > 0 ) {
-			tableElement.style("background", "Green");
+$('.redgreenHeavy').each(function() {
+	if ($(this).text() != 0) {
+		$(this).css('color', 'white');
+		if ($(this).text() > 0 ) {
+			$(this).css('background', 'Green');
 		} else {
-			tableElement.style("background", "FireBrick");
+			$(this).css('background', 'FireBrick');
 		}
 	}
+});
+
+// Toggle highlecting row of selected coins
+$('#portfolioTableBody tr td').click(function(e) {
+	$(this).toggleClass('silver');
+	$(this).siblings().not('.redgreenHeavy').toggleClass('silver');
 });

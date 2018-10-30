@@ -18,21 +18,21 @@
 	<!-- Top container for table summarizing portfolio, and the chart to show % change in current value-->
 	<div id="portfolio">
 	  <table id="portfolioTable">
-	    <thead class="portfolioTableHead">
+	    <thead id="portfolioTableHead">
 	      <tr>
-	        <th scope="col">Coin</th>
-	        <th scope="col">Current Price ($)</th>
-	        <th scope="col">Units</th>
-			<th scope="col">Cost ($)</th>
-			<th scope="col">Cost/Unit ($)</th>
-			<th scope="col">Unrealised Dollars ($)</th>
-			<th scope="col">Unrealised Pct (%)</th>
-			<th scope="col">Realised Dollars ($)</th>
-			<th scope="col">Gain/Loss ($)</th>
-			<th scope="col">Market Value</th>
+		      <th scope="col">Coin</th>
+		      <th scope="col">Current Price ($)</th>
+		      <th scope="col">Units</th>
+					<th scope="col">Cost ($)</th>
+					<th scope="col">Cost/Unit ($)</th>
+					<th scope="col">Unrealised Dollars ($)</th>
+					<th scope="col">Unrealised Pct (%)</th>
+					<th scope="col">Realised Dollars ($)</th>
+					<th scope="col">Gain/Loss ($)</th>
+					<th scope="col">Market Value</th>
 	      </tr>
 	    </thead>
-	    <tbody class="portfolioTableBody">
+	    <tbody id="portfolioTableBody">
 			<!-- Insert coin summary data here -->
 			{% for coin in coins %}
 				<tr class={{ coin }}>
@@ -60,19 +60,19 @@
 		        <th scope="col">Trade #</th>
 		        <th scope="col">Date</th>
 		        <th scope="col">Coin</th>
-				<th scope="col">Side</th>
-				<th scope="col">Units</th>
-				<th scope="col">Coin Price ($)</th>
-				<th scope="col">Fees ($)</th>
-				<th scope="col">Previous Units</th>
-				<th scope="col">Cumulative Units</th>
-				<th scope="col">Transacted Value ($)</th>
-				<th scope="col">Previous Cost ($)</th>
-				<th scope="col">Cost of Transaction ($)</th>
-				<th scope="col">Cost/Unit ($)</th>
-				<th scope="col">Cumulative Cost ($)</th>
-				<th scope="col">Gain/Loss From Sale ($)</th>
-				<th scope="col">Realised Gain/Loss (%)</th>
+						<th scope="col">Side</th>
+						<th scope="col">Units</th>
+						<th scope="col">Coin Price ($)</th>
+						<th scope="col">Fees ($)</th>
+						<th scope="col">Previous Units</th>
+						<th scope="col">Cumulative Units</th>
+						<th scope="col">Transacted Value ($)</th>
+						<th scope="col">Previous Cost ($)</th>
+						<th scope="col">Cost of Transaction ($)</th>
+						<th scope="col">Cost/Unit ($)</th>
+						<th scope="col">Cumulative Cost ($)</th>
+						<th scope="col">Gain/Loss From Sale ($)</th>
+						<th scope="col">Realised Gain/Loss (%)</th>
 		      </tr>
 			</thead>
 			<tbody id="transactionsTableBody">

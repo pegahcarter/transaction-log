@@ -2,22 +2,24 @@ body {
 	padding-left: 50px;
 	padding-right: 50px;
 	padding-top: 100px;
+	height: 1000px;
 }
 
 table {
 	text-align: center;
 	vertical-align: middle;
 	width: 100%;
+	border: 4px black solid;
 }
 
 thead {
 	min-width: 100%;
+	border: 4px black solid;
 	position: relative;
 }
 
 th {
-	font-size: 12px;
-	background-color: MidnightBlue;
+	background-color: DarkSlateGray;
 	color: Lavender;
 	font-weight: lighter;
 	height: 50px;
@@ -40,12 +42,17 @@ th, td {
 	display: block;
 	max-height: 400px;
 	overflow-y: auto;
+	font-size: 10px;
 }
 
 #transactionsTable {
 	table-layout: fixed;
 	border-collapse: collapse;
 	min-width: 100%;
+}
+
+#transactionsTableHead {
+	font-size: 8;
 }
 
 #transactionsTableBody {
@@ -61,4 +68,8 @@ th, td {
 
 .blue {
 	background: LightBlue;
+}
+
+.silver {
+	background: Silver;
 }
