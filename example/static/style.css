@@ -62,6 +62,10 @@ th, td {
 	}
 }
 
+.hideShowTransactions {
+	display: none;
+}
+
 .yellow {
 	background: PaleGoldenrod;
 }

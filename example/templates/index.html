@@ -35,7 +35,7 @@
 	    <tbody id="portfolioTableBody">
 			<!-- Insert coin summary data here -->
 			{% for coin in coins %}
-				<tr class={{ coin }}>
+				<tr>
 					<td> {{ coin }} </td>
 					<td> {{ "%.2f" | format(portfolio[coin]['last_price']) }} </td>
 					<td> {{ "%.2f" | format(portfolio[coin]['units']) }} </td>
@@ -78,7 +78,7 @@
 			<tbody id="transactionsTableBody">
 			<!-- Insert coin transactions data here-->
 				{% for transaction in transactions %}
-					<tr class={{ transaction.coin }}>
+					<tr class={{transaction.coin}}>
 						<td class="yellow"> {{ transaction.trade_num }} </td>
 						<td class="yellow"> {{ transaction.date.strftime("%Y-%m-%d") }} </td>
 						<td class="yellow"> {{ transaction.coin }} </td>
