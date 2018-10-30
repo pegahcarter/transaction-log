@@ -22,25 +22,7 @@ class Transaction(Base):
 	gain_loss = Column(Float(10,2))
 	realised_pct = Column(Float(10,2))
 
-	def __init__(self):
-		self.trade_num = trade_num
-		self.date = date
-		self.coin = coin
-		self.side = side
-		self.units = units
-		self.price_per_unit = price_per_unit
-		self.fees = fees
-		self.previous_units = previous_units
-		self.cumulative_units = cumulative_units
-		self.transacted_value = transacted_value
-		self.previous_cost = previous_cost
-		self.cost_of_transaction = cost_of_transaction
-		self.cost_per_unit = cost_per_unit
-		self.cumulative_cost = cumulative_cost
-		self.gain_loss = gain_loss
-		self.realised_pct = realised_pct
-
-	def __repr__(
+	def __init__(
 		self,
 		trade_num=None,
 		date=None,
@@ -59,4 +41,22 @@ class Transaction(Base):
 		gain_loss=None,
 		realised_pct=None):
 
+		self.trade_num = trade_num
+		self.date = date
+		self.coin = coin
+		self.side = side
+		self.units = units
+		self.price_per_unit = price_per_unit
+		self.fees = fees
+		self.previous_units = previous_units
+		self.cumulative_units = cumulative_units
+		self.transacted_value = transacted_value
+		self.previous_cost = previous_cost
+		self.cost_of_transaction = cost_of_transaction
+		self.cost_per_unit = cost_per_unit
+		self.cumulative_cost = cumulative_cost
+		self.gain_loss = gain_loss
+		self.realised_pct = realised_pct
+
+	def __repr__(self):
 		return('<Transactions %r>' % (self.trade_num))

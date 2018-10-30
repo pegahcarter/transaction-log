@@ -1,5 +1,6 @@
 from database import db_session, engine, init_db
-from functions import coin_price, init_first_purchases
+from models import Transaction
+from functions import coin_price
 from flask import Flask, request, render_template, redirect
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 from datetime import datetime
@@ -9,7 +10,7 @@ from datetime import datetime
 import ccxt
 
 # BTC, ETH, XRP, BCH, LTC coins to start
-coins = ['BTC','ETH','XRP','LTC']
+coins = ['BTC','ETH','LTC']
 
 # Date range - use median of starting mcap / ending mcap
 hist_cap = pd.read_csv('data/historical_market_cap.csv')
@@ -51,8 +52,27 @@ init_db()
 day = datetime.fromtimestamp(dates[0])
 for i in range(len(coins)):
 	price = starting_prices[i]
-	quantity = amt_each / price
-	init_first_purchase(coins[i], day, price, quantity)
+	quantity = coin_amts[i]
+	purchase = Transaction(
+		date = day,
+		coin = coins[i],
+		side = 'buy',
+		units = quantity,
+		price_per_unit = price,
+		fees = price * quantity * 0.0075,
+		previous_units = 0,
+		cumulative_units = quantity,
+		transacted_value = price * quantity,
+		previous_cost = 0,
+		cost_of_transaction = None,
+		cost_per_unit = None,
+		cumulative_cost = price * quantity,
+		gain_loss = 0,
+		realised_pct = None
+	)
+	db_session.add(purchase)
+	db_session.commit()
+
 
 # Simulate daily rebalance for one year
 for day in range(1, len(hist_prices)):
@@ -60,8 +80,7 @@ for day in range(1, len(hist_prices)):
 	while True:
 
 		# connect to db first
-		query = ''' SELECT * FROM transactions'''
-		transactions = pd.read_sql(sql=query, con=engine)
+		transactions = pd.read_sql_table('transactions', con=engine)
 
 		# Declaring variables
 		d_vals = hist_prices[day] * coin_amts
@@ -108,8 +127,8 @@ for day in range(1, len(hist_prices)):
 				transacted_value = d_amt * (1 + .0075)
 				cumulative_cost = previous_cost + transacted_value
 				cumulative_units = previous_units + quantity
-				# cost_of_transaction, cost_per_unit, gain_loss, realised_pct are N/A
-				cost_of_transaction, cost_per_unit, gain_loss, realised_pct = 0, 0, 0, 0
+				# cost_of_transaction, cost_per_unit, realised_pct are N/A
+				cost_of_transaction, cost_per_unit, realised_pct = None, None, None, None
 			else:
 				transacted_value = d_amt * (1 - .0075)
 				cost_of_transaction = quantity / previous_units * previous_cost
