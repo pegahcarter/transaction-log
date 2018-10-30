@@ -16,8 +16,7 @@ def coin_price(coin):
 	return price
 
 def init_first_purchase(coin, date, price, quantity):
-
-		purchase = Transaction(
+	purchase = Transaction(
 		date = date,
 		coin = coin,
 		units = q,
