@@ -1,17 +1,12 @@
-import os
-import sys
-import time
-import ccxt
+from database import db_session, engine, init_db
+from functions import coin_price, init_first_purchases
+from flask import Flask, request, render_template, redirect
+from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
+from datetime import datetime
 import pandas as pd
 import numpy as np
-import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from data.setup import Transactions, Base
-
-exchange = ccxt.bittrex()
-tickers = set()
-[tickers.add(ticker) for ticker in exchange.fetch_tickers()]
+from datetime import datetime
+import ccxt
 
 # BTC, ETH, XRP, BCH, LTC coins to start
 coins = ['BTC','ETH','XRP','LTC']
@@ -49,15 +44,22 @@ amt_each = start_amt / len(coins)
 starting_prices = hist_prices[0]
 coin_amts = amt_each / starting_prices
 
+# Create our db
+init_db()
+
+# Simulate initial purchase of coins on day 0
+day = datetime.fromtimestamp(dates[0])
+for i in range(len(coins)):
+	price = starting_prices[i]
+	quantity = amt_each / price
+	init_first_purchase(coins[i], day, price, quantity)
+
+# Simulate daily rebalance for one year
 for day in range(1, len(hist_prices)):
-	purchase_date = datetime.datetime.fromtimestamp(dates[day])
+	purchase_date = datetime.fromtimestamp(dates[day])
 	while True:
 
 		# connect to db first
-		engine = create_engine('sqlite:////Users/Carter/Documents/Github/rebalance-my-portfolio/example/data/transactions.db')
-		Base.metadata.bind = engine
-		DBSession = sessionmaker(bind=engine)
-		session = DBSession()
 		query = ''' SELECT * FROM transactions'''
 		transactions = pd.read_sql(sql=query, con=engine)
 
@@ -119,7 +121,7 @@ for day in range(1, len(hist_prices)):
 				realised_pct = gain_loss / cost_of_transaction
 
 			# push to SQL
-			session.add(Transactions(
+			sim_purchase = Transaction(
 				date = purchase_date,
 				coin = coin,
 				side = side,
@@ -135,10 +137,9 @@ for day in range(1, len(hist_prices)):
 				cumulative_cost = cumulative_cost,
 				gain_loss = gain_loss,
 				realised_pct = realised_pct
-			))
-			session.commit()
+			)
 
+			db_session.add(sim_purchase)
+			db_session.commit()
 
-
-
-transactions.loc[transactions['previous_cost'] < 100]
+#transactions.loc[transactions['previous_cost'] < 100]

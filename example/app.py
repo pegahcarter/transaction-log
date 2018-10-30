@@ -1,31 +1,16 @@
-from templates.setup import Base, Transactions
-from static.functions import coin_price
-from flask import Flask, request, render_template, redirect, jsonify, url_for, flash
-from flask import session as login_session
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, scoped_session
+from database import db_session, engine
+from models import Transaction
+from functions import coin_price
+from flask import Flask, request, render_template, redirect
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 from datetime import datetime
-import ccxt
-import numpy as np
 import pandas as pd
 # import plotly
-import os
-
-exchange = ccxt.binance()
 
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-engine = create_engine('sqlite:///data/transactions.db')
-db_session = scoped_session(sessionmaker(bind=engine))
-Base.query = db_session.query_property()
-
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
-
-# ------------------------------------------------------------------------------
 @app.route('/')
 def showTransactions():
 
@@ -39,7 +24,7 @@ def showTransactions():
 		cost = temp['cumulative_cost'][len(temp) - 1]
 		cost_per_unit = units/cost
 
-		last_price = coin_price(exchange, coin)
+		last_price = coin_price(coin)
 		unrealised_amt = (last_price - cost_per_unit) * units
 		unrealised_pct = unrealised_amt / cost
 
@@ -61,9 +46,13 @@ def showTransactions():
 
 		portfolio[coin] = coin_data
 
-	transactions = Transactions.query.all()
+	transactions = Transaction.query.all()
 	return render_template('index.html', portfolio=portfolio, coins=coins, transactions=transactions)
 
+# Close database connection as soon as an operation is complete
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+	db_session.remove()
 
 if __name__ == "__main__":
 	app.run(debug=True)
