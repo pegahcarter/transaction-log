@@ -2,9 +2,9 @@ body {
 	padding-left: 50px;
 	padding-right: 50px;
 	padding-top: 75px;
-	height: 1000px;
+	max-height: 1000px;
+	font-family: 'Roboto', sans-serif;
 }
-
 
 th {
 	background-color: DarkSlateGray;
@@ -30,23 +30,42 @@ table {
 	padding-bottom: 100px;
 }
 
-#portfolioTableHead {
+#portfolio th {
+	height: 50px;
 	font-size: 10pt;
 }
 
+#portfolio tr {
+	height: 30px;
+	font-size: 10pt;
+}
+
+#portfolioTable tr {
+	height: 30px;
+	font-size: 9.5pt;
+}
 
 #transactionsHeader {
 	width: calc(100% - 10px);
 }
 
-#transactionsBody {
+#transactionScroll {
 	overflow-y: auto;
 	margin-top: 0px;
 	height: 400px;
 }
 
+#transactionsBody tr, td {
+	height: 20px;
+	font-size: 8pt;
+}
+
 .hideShowTransactions {
 	display: none;
+}
+
+.bold {
+	font-weight: bold;
 }
 
 .yellow {

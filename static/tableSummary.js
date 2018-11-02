@@ -22,7 +22,7 @@ $('.redgreenHeavy').each(function() {
 $('#portfolioTableBody tr td').click(function(e) {
 
 	var coinName = $(this).siblings().first().text().trim();
-	$('#transactionsTable tbody .' + coinName).toggleClass('hideShowTransactions');
+	$('#transactionsBody tbody .' + coinName).toggleClass('hideShowTransactions');
 
 	$(this).toggleClass('silver');
 	$(this).siblings().not('.redgreenHeavy').toggleClass('silver');

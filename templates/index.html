@@ -4,8 +4,8 @@
   <!-- Top container for table summarizing portfolio, and the chart to show % change in current value-->
 	<div id="portfolio">
 		<div class="left half">
-		    <table id="portfolioTable">
-		      	<thead id="portfolioTableHead">
+		    <table>
+		      	<thead>
 			        <tr>
 						<th scope="col">Coin</th>
 						<th scope="col">Current Price ($)</th>
@@ -19,10 +19,10 @@
 						<th scope="col">Market Value</th>
 			        </tr>
 			    </thead>
-			    <tbody id="portfolioTableBody">
+			    <tbody>
 			    	{% for coin in coins %}
 				        <tr>
-							<td> {{ coin }} </td>
+							<td class="bold"> {{ coin }} </td>
 							<td> {{ "%.2f" | format(portfolio[coin]['last_price']) }} </td>
 							<td> {{ "%.2f" | format(portfolio[coin]['units']) }} </td>
 							<td> {{ "%.2f" | format(portfolio[coin]['cost']) }} </td>
@@ -45,7 +45,7 @@
   <!-- Bottom container for table showing transactions for selected coin above -->
   <div>
 		<div id="transactionsHeader">
-		    <table>
+		    <table id="transactionsBody">
 		        <thead>
 		          <tr>
 		            <th scope="col">Trade #</th>
@@ -68,14 +68,14 @@
 		      	</thead>
 		  	</table>
 		</div>
-		<div id="transactionsBody">
-			<table>
+		<div id="transactionScroll">
+			<table id="transactionsTable">
 	      		<tbody>
 			        {% for transaction in transactions %}
 			          	<tr class={{transaction.coin}}>
 				            <td class="yellow"> {{ transaction.trade_num }} </td>
 				            <td class="yellow"> {{ transaction.date.strftime("%Y-%m-%d") }} </td>
-				            <td class="yellow"> {{ transaction.coin }} </td>
+				            <td class="yellow bold"> {{ transaction.coin }} </td>
 				            <td class="blue redgreenLight"> {{ transaction.side }} </td>
 				            <td class="yellow"> {{ "%.2f" | format(transaction.units) }} </td>
 				            <td class="yellow"> {{ "%.2f" | format(transaction.price_per_unit) }} </td>
