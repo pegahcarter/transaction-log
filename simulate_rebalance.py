@@ -9,33 +9,19 @@ import numpy as np
 from datetime import datetime
 import ccxt
 
-# BTC, ETH, XRP, BCH, LTC coins to start
-coins = ['BTC','ETH','LTC']
-
-# Date range - use median of starting mcap / ending mcap
-hist_cap = pd.read_csv('data/historical_market_cap.csv')
-hist_cap = np.array(hist_cap)
-
-start_dates = hist_cap[:len(hist_cap) - 365]
-end_dates = hist_cap[365:]
-
-cap_diffs = list(end_dates[:, 3] - start_dates[:, 3])
-if len(cap_diffs) % 2 == 0:
-	cap_diffs.pop(len(cap_diffs) - 1)
-
-# Start date for simulations
-start_date = 0
+# BTC, ETH, XRP, LTC coins to start
+coins = ['BTC','ETH', 'LTC']
 
 hist_prices = pd.read_csv('data/historical_prices.csv')
 dates = hist_prices['date']
 hist_prices = np.array(hist_prices[coins])
 
-# Limit to current date range
-hist_prices = hist_prices[start_date:start_date + 365]
-dates = dates[start_date:start_date + 365]
+# Limit to one year of data
+hist_prices = hist_prices[:365]
+dates = dates[:365]
 
 fees = 0
-rate = 0.0075
+rate = 0.005
 start_amt = 5000
 thresh = 0.01
 avg_weight = 1 / len(coins)
@@ -82,8 +68,15 @@ for day in range(1, len(hist_prices)):
 		# connect to db first
 		transactions = pd.read_sql_table('transactions', con=engine)
 
+		coin_amts = []
+		# Update coin amounts
+		for coin in coins:
+			temp = transactions.loc[transactions['coin'] == coin, 'cumulative_units'].tolist()
+			coin_amts.append(temp[len(temp)-1])
+
 		# Declaring variables
 		d_vals = hist_prices[day] * coin_amts
+
 		d_vals_total = sum(d_vals)
 		l_index, h_index = d_vals.argmin(), d_vals.argmax()
 		weight_diffs = [avg_weight - d_vals[l_index]/d_vals_total, d_vals[h_index]/d_vals_total - avg_weight]
@@ -108,13 +101,9 @@ for day in range(1, len(hist_prices)):
 		# Sell h_index(or coin with most weight)/buy l_index(or coin with least weight)
 
 		# Get coin quantities to buy/sell based on current market price
-		l_quantity = d_amt / hist_prices[day, l_index]
+		l_quantity = d_amt / hist_prices[day, l_index] * (1 - rate)
 		h_quantity = d_amt / hist_prices[day, h_index]
 		trade_quantities = [l_quantity, h_quantity]
-
-		# Adjust coin quantities
-		coin_amts[l_index] += l_quantity
-		coin_amts[h_index] -= h_quantity
 
 		# Document trade
 		for coin, side, quantity in zip(trade_coins, trade_sides, trade_quantities):
@@ -124,13 +113,20 @@ for day in range(1, len(hist_prices)):
 			previous_cost = temp['cumulative_cost'].values[len(temp)-1]
 
 			if side == 'buy':
-				transacted_value = d_amt * (1 + .0075)
+				transacted_value = d_amt
+				cost_of_transaction = None
+				cost_per_unit = None
+
 				cumulative_cost = previous_cost + transacted_value
 				cumulative_units = previous_units + quantity
-				# cost_of_transaction, cost_per_unit, realised_pct are N/A
-				cost_of_transaction, cost_per_unit, realised_pct = None, None, None, None
+				gain_loss = None
+				realised_pct = None
+
+				# Binance charges fees on the buy side
+				fees = d_amt * .005
+
 			else:
-				transacted_value = d_amt * (1 - .0075)
+				transacted_value = d_amt
 				cost_of_transaction = quantity / previous_units * previous_cost
 				cost_per_unit = previous_cost / previous_units
 
@@ -139,6 +135,8 @@ for day in range(1, len(hist_prices)):
 				gain_loss = transacted_value - cost_of_transaction
 				realised_pct = gain_loss / cost_of_transaction
 
+				fees = None
+
 			# push to SQL
 			sim_purchase = Transaction(
 				date = purchase_date,
@@ -146,7 +144,7 @@ for day in range(1, len(hist_prices)):
 				side = side,
 				units = quantity,
 				price_per_unit = hist_prices[day, coins.index(coin)],
-				fees = d_amt * .0075,
+				fees = fees,
 				previous_units = previous_units,
 				cumulative_units = cumulative_units,
 				transacted_value = transacted_value,

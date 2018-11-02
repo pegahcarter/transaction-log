@@ -7,14 +7,13 @@ from datetime import datetime
 import pandas as pd
 # import plotly
 
-
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 @app.route('/')
 def showTransactions():
 
-	df = pd.read_sql(sql=''' SELECT * FROM transactions''', con=engine)
+	df = pd.read_sql_table('transactions', con=engine)
 	coins = list(set(df['coin'].tolist()))
 	portfolio = {}
 
@@ -22,13 +21,13 @@ def showTransactions():
 		temp = df.loc[df['coin'] == coin].reset_index(drop=True)
 		units = temp['cumulative_units'][len(temp) - 1]
 		cost = temp['cumulative_cost'][len(temp) - 1]
-		cost_per_unit = units/cost
+		cost_per_unit = cost/units
 
 		last_price = coin_price(coin)
 		unrealised_amt = (last_price - cost_per_unit) * units
 		unrealised_pct = unrealised_amt / cost
 
-		realised_amt = sum(temp.loc[temp['side'] == 'buy']['gain_loss'])
+		realised_amt = sum(temp['gain_loss'].dropna())
 		gain_loss = unrealised_amt + realised_amt
 		market_val = cost + unrealised_amt
 

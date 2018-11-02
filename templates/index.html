@@ -73,7 +73,11 @@
             <td class="blue redgreenLight"> {{ transaction.side }} </td>
             <td class="yellow"> {{ "%.2f" | format(transaction.units) }} </td>
             <td class="yellow"> {{ "%.2f" | format(transaction.price_per_unit) }} </td>
-            <td class="yellow"> {{ "%.2f" | format(transaction.fees) }} </td>
+			{% if transaction.fees is not none %}
+				<td class="yellow"> {{ "%.2f" | format(transaction.fees) }} </td>
+			{% else %}
+				<td class="yellow"></td>
+			{% endif %}
             <td class="blue"> {{ "%.2f" | format(transaction.previous_units) }} </td>
             <td class="blue"> {{ "%.2f" | format(transaction.cumulative_units) }} </td>
             <td class="blue"> {{ "%.2f" | format(transaction.transacted_value) }} </td>
