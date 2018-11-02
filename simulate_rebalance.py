@@ -106,19 +106,20 @@ for day in range(1, len(hist_prices)):
 		trade_quantities = [l_quantity, h_quantity]
 
 		# Document trade
-		for coin, side, quantity in zip(trade_coins, trade_sides, trade_quantities):
+		for coin, side, units in zip(trade_coins, trade_sides, trade_quantities):
 
 			temp = transactions.loc[transactions['coin'] == coin]
 			previous_units = temp['cumulative_units'].values[len(temp)-1]
 			previous_cost = temp['cumulative_cost'].values[len(temp)-1]
 
+			transacted_value = d_amt
+			
 			if side == 'buy':
-				transacted_value = d_amt
 				cost_of_transaction = None
 				cost_per_unit = None
 
 				cumulative_cost = previous_cost + transacted_value
-				cumulative_units = previous_units + quantity
+				cumulative_units = previous_units + units
 				gain_loss = None
 				realised_pct = None
 
@@ -126,12 +127,11 @@ for day in range(1, len(hist_prices)):
 				fees = d_amt * .005
 
 			else:
-				transacted_value = d_amt
-				cost_of_transaction = quantity / previous_units * previous_cost
+				cost_of_transaction = units / previous_units * previous_cost
 				cost_per_unit = previous_cost / previous_units
 
 				cumulative_cost = previous_cost - transacted_value
-				cumulative_units = previous_units - quantity
+				cumulative_units = previous_units - units
 				gain_loss = transacted_value - cost_of_transaction
 				realised_pct = gain_loss / cost_of_transaction
 
@@ -142,7 +142,7 @@ for day in range(1, len(hist_prices)):
 				date = purchase_date,
 				coin = coin,
 				side = side,
-				units = quantity,
+				units = units,
 				price_per_unit = hist_prices[day, coins.index(coin)],
 				fees = fees,
 				previous_units = previous_units,

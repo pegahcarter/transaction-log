@@ -25,11 +25,11 @@ def showTransactions():
 
 		last_price = coin_price(coin)
 		unrealised_amt = (last_price - cost_per_unit) * units
-		unrealised_pct = unrealised_amt / cost
-
 		realised_amt = sum(temp['gain_loss'].dropna())
 		gain_loss = unrealised_amt + realised_amt
+
 		market_val = cost + unrealised_amt
+		unrealised_pct = unrealised_amt / market_val
 
 		coin_data = {
 			'last_price': last_price,
