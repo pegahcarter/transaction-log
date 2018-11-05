@@ -4,7 +4,7 @@
   <!-- Top container for table summarizing portfolio, and the chart to show % change in current value-->
 	<div id="portfolio">
 		<div class="left half">
-		    <table>
+		    <table class="sortable">
 		      	<thead>
 			        <tr>
 						<th scope="col">Coin</th>
@@ -22,16 +22,16 @@
 			    <tbody>
 			    	{% for coin in coins %}
 				        <tr>
-							<td class="bold"> {{ coin }} </td>
-							<td> {{ "%.2f" | format(portfolio[coin]['last_price']) }} </td>
-							<td> {{ "%.2f" | format(portfolio[coin]['units']) }} </td>
-							<td> {{ "%.2f" | format(portfolio[coin]['cost']) }} </td>
-							<td> {{ "%.2f" | format(portfolio[coin]['cost_per_unit']) }} </td>
-							<td> {{ "%.2f" | format(portfolio[coin]['unrealised_amt']) }} </td>
-							<td> {{ "%.2f" | format(portfolio[coin]['unrealised_pct'] * 100) }} </td>
-							<td> {{ "%.2f" | format(portfolio[coin]['realised_amt']) }} </td>
-							<td class="redgreenHeavy"> {{ "%.2f" | format(portfolio[coin]['gain_loss']) }} </td>
-							<td> {{ "%.2f" | format(portfolio[coin]['market_val']) }} </td>
+							<td class="bold">{{ coin }}</td>
+							<td>{{ "%.2f" | format(portfolio[coin]['last_price']) }}</td>
+							<td>{{ "%.2f" | format(portfolio[coin]['units']) }}</td>
+							<td>{{ "%.2f" | format(portfolio[coin]['cost']) }}</td>
+							<td>{{ "%.2f" | format(portfolio[coin]['cost_per_unit']) }}</td>
+							<td>{{ "%.2f" | format(portfolio[coin]['unrealised_amt']) }}</td>
+							<td>{{ "%.2f" | format(portfolio[coin]['unrealised_pct'] * 100) }}</td>
+							<td>{{ "%.2f" | format(portfolio[coin]['realised_amt']) }}</td>
+							<td class="redgreenHeavy">{{ "%.2f" | format(portfolio[coin]['gain_loss']) }}</td>
+							<td>{{ "%.2f" | format(portfolio[coin]['market_val']) }}</td>
 				        </tr>
 			        {% endfor %}
 			    </tbody>
@@ -73,35 +73,37 @@
 	      		<tbody>
 			        {% for transaction in transactions %}
 			          	<tr class={{transaction.coin}}>
-				            <td class="yellow"> {{ transaction.trade_num }} </td>
-				            <td class="yellow"> {{ transaction.date.strftime("%Y-%m-%d") }} </td>
-				            <td class="yellow bold"> {{ transaction.coin }} </td>
-				            <td class="blue redgreenLight"> {{ transaction.side }} </td>
-				            <td class="yellow"> {{ "%.2f" | format(transaction.units) }} </td>
-				            <td class="yellow"> {{ "%.2f" | format(transaction.price_per_unit) }} </td>
-							{% if transaction.fees is not none %}
-								<td class="yellow"> {{ "%.2f" | format(transaction.fees) }} </td>
+							<!-- Data that's the same for both buy and sell transactions -->
+				            <td class="yellow">{{ transaction.trade_num }}</td>
+				            <td class="yellow">{{ transaction.date.strftime("%Y-%m-%d") }}</td>
+				            <td class="yellow bold">{{ transaction.coin }}</td>
+				            <td class="blue redgreenLight">{{ transaction.side }}</td>
+				            <td class="yellow">{{ "%.2f" | format(transaction.units) }}</td>
+				            <td class="yellow">{{ "%.2f" | format(transaction.price_per_unit) }}</td>
+							<!-- Add 'buy' transaction data -->
+							{% if transaction.side == 'buy' %}
+								<td class="yellow">{{ "%.2f" | format(transaction.fees) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.previous_units) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.cumulative_units) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.transacted_value) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.previous_cost) }}</td>
+								<td class="blue"></td>
+								<td class="blue"></td>
+								<td class="blue">{{ "%.2f" | format(transaction.cumulative_cost) }}</td>
+								<td class="blue"></td>
+								<td class="blue"></td>
+							<!-- Add 'sell' transaction data -->
 							{% else %}
 								<td class="yellow"></td>
-							{% endif %}
-				            <td class="blue"> {{ "%.2f" | format(transaction.previous_units) }} </td>
-				            <td class="blue"> {{ "%.2f" | format(transaction.cumulative_units) }} </td>
-				            <td class="blue"> {{ "%.2f" | format(transaction.transacted_value) }} </td>
-				            <td class="blue"> {{ "%.2f" | format(transaction.previous_cost) }} </td>
-							{% if transaction.cost_of_transaction is not none %}
-								<td class="blue"> {{ "%.2f" | format(transaction.cost_of_transaction) }} </td>
-								<td class="blue"> {{ "%.2f" | format(transaction.cost_per_unit) }} </td>
-							{% else %}
-								<td class="blue"> </td>
-								<td class="blue"></td>
-							{% endif %}
-				            <td class="blue"> {{ "%.2f" | format(transaction.cumulative_cost) }} </td>
-							{% if transaction.realised_pct is not none %}
-								<td class="redgreenHeavy"> {{ "%.2f" | format(transaction.gain_loss) }} </td>
-				            	<td class="redgreenHeavy"> {{ "%.2f" | format(transaction.realised_pct * 100) }} </td>
-							{% else %}
-								<td class="blue"></td>
-								<td class="blue"></td>
+								<td class="blue">{{ "%.2f" | format(transaction.previous_units) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.cumulative_units) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.transacted_value) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.previous_cost) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.cost_of_transaction) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.cost_per_unit) }}</td>
+								<td class="blue">{{ "%.2f" | format(transaction.cumulative_cost) }}</td>
+								<td class="redgreenHeavy">{{ "%.2f" | format(transaction.gain_loss) }}</td>
+								<td class="redgreenHeavy">{{ "%.2f" | format(transaction.realised_pct * 100) }}</td>
 							{% endif %}
 			         	</tr>
 			        {% endfor %}

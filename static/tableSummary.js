@@ -19,16 +19,11 @@ $('.redgreenHeavy').each(function() {
 
 
 // Toggle highlecting row of selected coins
-$('#portfolioTableBody tr td').click(function(e) {
+$('#portfolio tr td').click(function(e) {
 
 	var coinName = $(this).siblings().first().text().trim();
-	$('#transactionsBody tbody .' + coinName).toggleClass('hideShowTransactions');
+	$('.' + coinName).toggleClass('hideShowTransactions');
 
 	$(this).toggleClass('silver');
 	$(this).siblings().not('.redgreenHeavy').toggleClass('silver');
-	if ($(this).hasClass('silver')) {
-		console.log('this is silver');
-	} else {
-		console.log('this is not silver');
-	}
 });
