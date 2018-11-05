@@ -28,6 +28,7 @@ table {
 
 #portfolio {
 	padding-bottom: 100px;
+	display: flex;
 }
 
 #portfolio th {
@@ -38,11 +39,6 @@ table {
 #portfolio tr {
 	height: 30px;
 	font-size: 10pt;
-}
-
-#portfolioTable tr {
-	height: 30px;
-	font-size: 9.5pt;
 }
 
 #transactionsHeader {
@@ -58,6 +54,23 @@ table {
 #transactionsBody tr, td {
 	height: 20px;
 	font-size: 8pt;
+}
+
+#portfolioTable {
+	width: 60%;
+}
+
+#portfolioGraph {
+	width: 40%;
+}
+
+.bar {
+	fill: #5f89ad;
+}
+
+.axis line {
+	fill: none;
+	display: none;
 }
 
 .hideShowTransactions {
@@ -78,10 +91,6 @@ table {
 
 .silver {
 	background: Silver;
-}
-
-.left {
-	width: 60%;
 }
 
 ::-webkit-scrollbar {

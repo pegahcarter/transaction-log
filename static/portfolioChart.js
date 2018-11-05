@@ -1,78 +1,67 @@
-// Define SVG area dimensions
-var svgWidth = 600;
-var svgHeight = 450;
+var graphLabels = []
+d3.selectAll('#portfolioGraphLabel')
+	.each(function(e) {
+		graphLabels.push(d3.select(this).text());
+	});
 
-// Define the chart's margins as an object
-var chartMargin = {
-  top: 30,
-  right: 30,
-  bottom: 30,
-  left: 30
-};
+var graphData = []
+d3.selectAll('#portfolioGraphData')
+	.each(function(e) {
+		graphData.push(d3.select(this).text());
+	});
 
-// Define dimensions of the chart area
-var chartWidth = svgWidth - chartMargin.left - chartMargin.right;
-var chartHeight = svgHeight - chartMargin.top - chartMargin.bottom;
+data = []
+for (var i=0; i < graphLabels.length; i++) {
+	data.push({
+		name: graphLabels[i],
+		value: Number(graphData[i])
+	});
+}
+
+
+var margin = {
+	top: 0,
+	right: 0,
+	bottom: 0,
+	left: 50
+}
+
+width = 250 - margin.left - margin.right
+height = 200 - margin.top - margin.bottom
 
 // Select body, append SVG area to it, and set the dimensions
-var svg = d3.select(".right")
-  .append("svg")
-  .attr("height", svgHeight)
-  .attr("width", svgWidth);
+var svg = d3.select("#portfolioGraph").append("svg")
+	.attr("height", width + margin.left + margin.right)
+	.attr("width", height + margin.top + margin.bottom)
 
-// Append a group to the SVG area and shift ('translate') it to the right and to the bottom
 var chartGroup = svg.append("g")
-  .attr("transform", `translate(${chartMargin.left}, ${chartMargin.top})`);
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+var x = d3.scaleLinear()
+	.range([0, width])
+	.domain(d3.extent(data, d => d.value));
 
-/*
-	// Load data from hours-of-tv-watched.csv
-	d3.csv("hours-of-tv-watched.csv", function(error, tvData) {
-	  if (error) throw error;
+var y = d3.scaleBand()
+	.range([height, 0])
+	.domain(data.map(d => d.name))
+	.padding(0.1);
 
-	  console.log(tvData);
+var xAxis = d3.axisBottom(x);
+var yAxis = d3.axisLeft(y);
 
-	  // Cast the hours value to a number for each piece of tvData
-	  tvData.forEach(function(d) {
-	    d.hours = +d.hours;
-	  });
+chartGroup.append("g")
+	.call(xAxis);
 
-	  // Configure a band scale for the horizontal axis with a padding of 0.1 (10%)
-	  var xBandScale = d3.scaleBand()
-	    .domain(tvData.map(d => d.name))
-	    .range([0, chartWidth])
-	    .padding(0.1);
+chartGroup.append("g")
+	.call(yAxis)
+	.attr("transform", "translate(0," + width + ")");
 
-	  // Create a linear scale for the vertical axis.
-	  var yLinearScale = d3.scaleLinear()
-	    .domain([0, d3.max(tvData, d => d.hours)])
-	    .range([chartHeight, 0]);
-
-	  // Create two new functions passing our scales in as arguments
-	  // These will be used to create the chart's axes
-	  var bottomAxis = d3.axisBottom(xBandScale);
-	  var leftAxis = d3.axisLeft(yLinearScale).ticks(10);
-
-	  // Append two SVG group elements to the chartGroup area,
-	  // and create the bottom and left axes inside of them
-	  chartGroup.append("g")
-	    .call(leftAxis);
-
-	  chartGroup.append("g")
-	    .attr("transform", `translate(0, ${chartHeight})`)
-	    .call(bottomAxis);
-
-	  // Create one SVG rectangle per piece of tvData
-	  // Use the linear and band scales to position each rectangle within the chart
-	  chartGroup.selectAll(".bar")
-	    .data(tvData)
-	    .enter()
-	    .append("rect")
-	    .attr("class", "bar")
-	    .attr("x", d => xBandScale(d.name))
-	    .attr("y", d => yLinearScale(d.hours))
-	    .attr("width", xBandScale.bandwidth())
-	    .attr("height", d => chartHeight - yLinearScale(d.hours));
-
-	});
-*/
+chartGroup.selectAll(".bar")
+	.data(data)
+	.enter()
+	.append("rect")
+	.classed("bar", true)
+	.attr("x", d => x(d.value))
+	.attr("y", d => y(d.name))
+	.attr("width", d => height - x(d.value))
+	.attr("height", y.bandwidth());

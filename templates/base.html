@@ -6,12 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>My Portfolio</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
 	<script src="{{ url_for('static', filename='sortTable.js') }}"></script>
 </head>
 <body>
 	{% block content %} {% endblock %}
 	<script src="{{ url_for('static', filename='tableSummary.js') }}" charset="utf-8"></script>
+	<script src="{{ url_for('static', filename='portfolioChart.js') }}" charset="utf-8"></script>
 </body>
 </html>
