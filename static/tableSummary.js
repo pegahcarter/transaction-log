@@ -1,5 +1,5 @@
 $('.redgreenLight').each(function() {
-	if ($(this).text() == ' buy ') {
+	if ($(this).text() == 'buy') {
 		$(this).css('background', 'LightGreen');
 	} else {
 		$(this).css('background', 'LightCoral');
@@ -21,7 +21,7 @@ $('.redgreenHeavy').each(function() {
 // Toggle highlecting row of selected coins
 $('#portfolio tr td').click(function(e) {
 
-	var coinName = $(this).siblings().first().text().trim();
+	var coinName = $(this).siblings().first().text();
 	$('.' + coinName).toggleClass('hideShowTransactions');
 
 	$(this).toggleClass('silver');
