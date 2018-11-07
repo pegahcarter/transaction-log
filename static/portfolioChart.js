@@ -14,15 +14,15 @@ data = []
 for (var i=0; i < graphLabels.length; i++) {
 	data.push({
 		name: graphLabels[i],
-		value: Number(graphData[i])
+		value: Number(graphData[i])/100
 	});
 }
 
 
 var margin = {
-	top: 10,
+	top: 40,
 	right: 50,
-	bottom: 20,
+	bottom: 25,
 	left: 50
 }
 
@@ -40,7 +40,8 @@ var y = d3.scale.ordinal()
 var xAxis = d3.svg.axis()
 	.scale(x)
 	.orient("bottom")
-	.tickFormat(d3.format(".0%"));
+	.tickFormat(d3.format(".0%"))
+	.ticks(10);
 
 var yAxis = d3.svg.axis()
 	.scale(y)
@@ -50,8 +51,11 @@ var yAxis = d3.svg.axis()
 
 // Select body, append SVG area to it, and set the dimensions
 var svg = d3.select("#portfolioGraph").append("svg")
-		.attr("height", width + margin.left + margin.right)
-		.attr("width", height + margin.top + margin.bottom)
+	.attr(
+	{
+		"height": width + margin.left + margin.right,
+		"width": height + margin.top + margin.bottom
+	});
 
 var chartGroup = svg.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -62,25 +66,55 @@ y.domain(data.map(d => d.name));
 chartGroup.selectAll(".bar")
 		.data(data)
 	.enter().append("rect")
-		.attr("class", d => "bar bar--" + (d.value < 0 ? "negative" : "positive"))
-		.attr("x", d => x(Math.min(0, d.value)))
-		.attr("y", d => y(d.name))
-		.attr("width", d => Math.abs(x(d.value) - x(0)))
-		.attr("height", y.rangeBand()-2)
+		.attr(
+		{
+			"class": d => "bar bar--" + (d.value < 0 ? "negative" : "positive"),
+			"x": d => x(Math.min(0, d.value)),
+			"y": d => y(d.name),
+			"width": d => Math.abs(x(d.value) - x(0)),
+			"height": y.rangeBand()-2
+		});
+
 
 chartGroup.append("g")
-	.attr("class", "x axis")
-	.attr("transform", "translate(0," + height + ")")
+	.attr(
+	{
+		"class": "x axis",
+		"transform": "translate(0," + height + ")",
+	})
 	.call(xAxis);
 
 chartGroup.append("g")
-	.attr("class", "y axis")
-	.attr("transform", "translate(" + x(0) + ",0)")
+	.attr(
+	{
+		"class": "y axis",
+		"transform": "translate(" + x(0) + ",0)"
+	})
 	.call(yAxis);
 
-d3.select('svg')
-	.attr("width", "600px")
-	.attr("height", "200px")
-	.style("border-style", "ridge")
 
-// https://bl.ocks.org/mbostock/2368837
+chartGroup.append("text")
+	.text("Current  Performance")
+	.attr(
+	{
+		"text-anchor": "middle",
+		"transform": "translate(-20," + (height/2 - 10) + ")rotate(-90)",
+		"font-size": "9pt"
+	});
+
+chartGroup.append("text")
+	.text("% Change in Current Value")
+	.attr(
+	{
+			"text-anchor": "middle",
+			"transform": "translate(" + width/2 + ",-10)"
+	});
+
+
+d3.select("svg")
+	.style("border-style", "ridge")
+	.attr(
+	{
+		"width": "600px",
+		"height": "200px"
+	});

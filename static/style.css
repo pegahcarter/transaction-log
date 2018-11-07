@@ -33,12 +33,12 @@ table {
 
 #portfolio th {
 	height: 50px;
-	font-size: 10pt;
+	font-size: 9pt;
 }
 
 #portfolio tr {
 	height: 30px;
-	font-size: 10pt;
+	font-size: 9pt;
 }
 
 #transactionsHeader {
@@ -90,6 +90,8 @@ table {
 .axis line {
 	fill: none;
 	display: none;
+	stroke: lightgrey;
+	opacity: 0.7;
 }
 
 .hideShowTransactions {

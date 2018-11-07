@@ -27,9 +27,9 @@
 							<td>{{ "%.2f" | format(portfolio[coin]['units']) }}</td>
 							<td>{{ "%.2f" | format(portfolio[coin]['cost']) }}</td>
 							<td>{{ "%.2f" | format(portfolio[coin]['cost_per_unit']) }}</td>
-							<td>{{ "%.2f" | format(portfolio[coin]['unrealised_amt']) }}</td>
-							<td id="portfolioGraphData">{{ "%.2f" | format(portfolio[coin]['unrealised_pct'] * 100) }}</td>
-							<td>{{ "%.2f" | format(portfolio[coin]['realised_amt']) }}</td>
+							<td class="redgreenHeavy">{{ "%.2f" | format(portfolio[coin]['unrealised_amt']) }}</td>
+							<td id="portfolioGraphData" class="redgreenHeavy">{{ "%.2f" | format(portfolio[coin]['unrealised_pct'] * 100) }}</td>
+							<td class="redgreenHeavy">{{ "%.2f" | format(portfolio[coin]['realised_amt']) }}</td>
 							<td class="redgreenHeavy">{{ "%.2f" | format(portfolio[coin]['gain_loss']) }}</td>
 							<td>{{ "%.2f" | format(portfolio[coin]['market_val']) }}</td>
 				    </tr>
