@@ -56,16 +56,35 @@ table {
 	font-size: 8pt;
 }
 
-#portfolioTable {
+#portfolioGraph {
+	width: 40%;
+	padding-left: 50px;
+}
+
+.axis path, .axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+
+.axis text {
+	font-size: 8pt;
+}
+
+.three-quarters {
 	width: 60%;
 }
 
-#portfolioGraph {
-	width: 40%;
+.one-quarter {
+	width: 25%;
 }
 
-.bar {
-	fill: #5f89ad;
+.bar--positive {
+	fill: lightgreen;
+}
+
+.bar--negative {
+	fill: lightcoral;
 }
 
 .axis line {

@@ -3,10 +3,10 @@
 {% block content %}
   <!-- Top container for table summarizing portfolio, and the chart to show % change in current value-->
 	<div id="portfolio">
-		<div id="portfolioTable" class="left">
-		    <table class="sortable">
-		      	<thead>
-			        <tr>
+		<div id="portfolioTable" class="left three-quarters">
+	    <table class="sortable">
+      	<thead>
+	        <tr>
 						<th scope="col">Coin</th>
 						<th scope="col">Current Price ($)</th>
 						<th scope="col">Units</th>
@@ -17,11 +17,11 @@
 						<th scope="col">Realised Dollars ($)</th>
 						<th scope="col">Gain/Loss ($)</th>
 						<th scope="col">Market Value</th>
-			        </tr>
-			    </thead>
-			    <tbody class="portfolioData">
-			    	{% for coin in coins %}
-				        <tr>
+	        </tr>
+		    </thead>
+			  <tbody class="portfolioData">
+			   	{% for coin in coins %}
+				    <tr>
 							<td id="portfolioGraphLabel" class="bold">{{ coin }}</td>
 							<td>{{ "%.2f" | format(portfolio[coin]['last_price']) }}</td>
 							<td>{{ "%.2f" | format(portfolio[coin]['units']) }}</td>
@@ -32,54 +32,54 @@
 							<td>{{ "%.2f" | format(portfolio[coin]['realised_amt']) }}</td>
 							<td class="redgreenHeavy">{{ "%.2f" | format(portfolio[coin]['gain_loss']) }}</td>
 							<td>{{ "%.2f" | format(portfolio[coin]['market_val']) }}</td>
-				        </tr>
-			        {% endfor %}
-			    </tbody>
-		    </table>
+				    </tr>
+			    {% endfor %}
+			  </tbody>
+		  </table>
 		</div>
 
-		<div id="portfolioGraph" class="right">
+		<div id="portfolioGraph" class="right one-quarter">
 		</div>
 
 	</div>
   <!-- Bottom container for table showing transactions for selected coin above -->
   <div>
 		<div id="transactionsHeader">
-		    <table id="transactionsBody">
-		        <thead>
-		          <tr>
-		            <th scope="col">Trade #</th>
-		            <th scope="col">Date</th>
-		            <th scope="col">Coin</th>
-		            <th scope="col">Side</th>
-		            <th scope="col">Units</th>
-		            <th scope="col">Coin Price ($)</th>
-		            <th scope="col">Fees ($)</th>
-		            <th scope="col">Previous Units</th>
-		            <th scope="col">Cumulative Units</th>
-		            <th scope="col">Transacted Value ($)</th>
-		            <th scope="col">Previous Cost ($)</th>
-		            <th scope="col">Cost of Transaction ($)</th>
-		            <th scope="col">Cost/Unit ($)</th>
-		            <th scope="col">Cumulative Cost ($)</th>
-		            <th scope="col">Gain/Loss From Sale ($)</th>
-		            <th scope="col">Realised Gain/Loss (%)</th>
-		          </tr>
-		      	</thead>
-		  	</table>
+	    <table id="transactionsBody">
+        <thead>
+          <tr>
+            <th scope="col">Trade #</th>
+            <th scope="col">Date</th>
+            <th scope="col">Coin</th>
+            <th scope="col">Side</th>
+            <th scope="col">Units</th>
+            <th scope="col">Coin Price ($)</th>
+            <th scope="col">Fees ($)</th>
+            <th scope="col">Previous Units</th>
+            <th scope="col">Cumulative Units</th>
+            <th scope="col">Transacted Value ($)</th>
+            <th scope="col">Previous Cost ($)</th>
+            <th scope="col">Cost of Transaction ($)</th>
+            <th scope="col">Cost/Unit ($)</th>
+            <th scope="col">Cumulative Cost ($)</th>
+            <th scope="col">Gain/Loss From Sale ($)</th>
+            <th scope="col">Realised Gain/Loss (%)</th>
+          </tr>
+      	</thead>
+	  	</table>
 		</div>
 		<div id="transactionScroll">
 			<table id="transactionsTable">
-	      		<tbody>
-			        {% for transaction in transactions %}
-			          	<tr class={{transaction.coin}}>
+    		<tbody>
+	        {% for transaction in transactions %}
+          	<tr class={{transaction.coin}}>
 							<!-- Data that's the same for both buy and sell transactions -->
-				            <td class="yellow">{{ transaction.trade_num }}</td>
-				            <td class="yellow">{{ transaction.date.strftime("%Y-%m-%d") }}</td>
-				            <td class="yellow bold">{{ transaction.coin }}</td>
-				            <td class="blue redgreenLight">{{ transaction.side }}</td>
-				            <td class="yellow">{{ "%.2f" | format(transaction.units) }}</td>
-				            <td class="yellow">{{ "%.2f" | format(transaction.price_per_unit) }}</td>
+	            <td class="yellow">{{ transaction.trade_num }}</td>
+	            <td class="yellow">{{ transaction.date.strftime("%Y-%m-%d") }}</td>
+	            <td class="yellow bold">{{ transaction.coin }}</td>
+	            <td class="blue redgreenLight">{{ transaction.side }}</td>
+	            <td class="yellow">{{ "%.2f" | format(transaction.units) }}</td>
+	            <td class="yellow">{{ "%.2f" | format(transaction.price_per_unit) }}</td>
 							<!-- Add 'buy' transaction data -->
 							{% if transaction.side == 'buy' %}
 								<td class="yellow">{{ "%.2f" | format(transaction.fees) }}</td>
@@ -105,9 +105,10 @@
 								<td class="redgreenHeavy">{{ "%.2f" | format(transaction.gain_loss) }}</td>
 								<td class="redgreenHeavy">{{ "%.2f" | format(transaction.realised_pct * 100) }}</td>
 							{% endif %}
-			         	</tr>
-			        {% endfor %}
-			    </tbody>
+	         	</tr>
+	        {% endfor %}
+		    </tbody>
 			</table>
-	  	</div>
+  	</div>
+	</div>
 {% endblock %}
