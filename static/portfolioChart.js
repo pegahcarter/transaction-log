@@ -110,7 +110,6 @@ chartGroup.append("text")
 			"transform": "translate(" + width/2 + ",-10)"
 	});
 
-
 d3.select("svg")
 	.style("border-style", "ridge")
 	.attr(

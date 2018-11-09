@@ -112,6 +112,7 @@ table {
 
 .silver {
 	background: Silver;
+	fill: Silver;
 }
 
 ::-webkit-scrollbar {
