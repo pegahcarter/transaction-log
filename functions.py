@@ -1,8 +1,7 @@
+#TODO: figure out if I need to update exchange every time, or just fetchBalance()
 from database import db_session, engine
 from models import Transaction
-import ccxt
-
-exchange = ccxt.binance()
+from exchange import exchange
 
 # Function to get current coin price in $
 def coin_price(coin):

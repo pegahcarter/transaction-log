@@ -91,15 +91,6 @@ for day in range(1, len(hist_prices)):
 		trade_sides = ['buy','sell']
 		trade_coins = [coins[l_index], coins[h_index]]
 
- 		# pretend we perfectly swap the coins and don't need a BTC intermediary trade
-		# ASSUMPTION: trade rate will always be .0025, which means there's a perfect ratio
-		# If we have to convert to BTC first, two trades will be executed, a.k.a. 0.005
-
-		# the ratio of buy/sell will never matter
-		# BECAUSE WE WILL ALWAYS BE BUYING THE (NOT LOWER WEIGHT) BUT COIN OF
-		# LOWEST WEIGHT, AND SELLING THE COIN OF HEAVIEST WEIGHT
-		# Sell h_index(or coin with most weight)/buy l_index(or coin with least weight)
-
 		# Get coin quantities to buy/sell based on current market price
 		l_quantity = d_amt / hist_prices[day, l_index] * (1 - rate)
 		h_quantity = d_amt / hist_prices[day, h_index]
@@ -112,27 +103,25 @@ for day in range(1, len(hist_prices)):
 			previous_units = temp['cumulative_units'].values[len(temp)-1]
 			previous_cost = temp['cumulative_cost'].values[len(temp)-1]
 
-			transacted_value = d_amt
-			
+
 			if side == 'buy':
 				cost_of_transaction = None
 				cost_per_unit = None
 
-				cumulative_cost = previous_cost + transacted_value
+				cumulative_cost = previous_cost + d_amt
 				cumulative_units = previous_units + units
 				gain_loss = None
 				realised_pct = None
 
-				# Binance charges fees on the buy side
 				fees = d_amt * .005
 
 			else:
 				cost_of_transaction = units / previous_units * previous_cost
 				cost_per_unit = previous_cost / previous_units
 
-				cumulative_cost = previous_cost - transacted_value
+				cumulative_cost = previous_cost - d_amt
 				cumulative_units = previous_units - units
-				gain_loss = transacted_value - cost_of_transaction
+				gain_loss = d_amt - cost_of_transaction
 				realised_pct = gain_loss / cost_of_transaction
 
 				fees = None
@@ -147,7 +136,7 @@ for day in range(1, len(hist_prices)):
 				fees = fees,
 				previous_units = previous_units,
 				cumulative_units = cumulative_units,
-				transacted_value = transacted_value,
+				transacted_value = d_amt,
 				previous_cost = previous_cost,
 				cost_of_transaction = cost_of_transaction,
 				cost_per_unit = cost_per_unit,
