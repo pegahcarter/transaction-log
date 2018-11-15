@@ -64,10 +64,6 @@ def Update(dual_trade, coins, sides, quantities, t, session):
 			Initialize(session,exchange, coin)
 
 		# Refresh our dataframe with the updated SQL transactions
-		engine = create_engine('sqlite:///../sql/transactions.db')
-		Base.metadata.bind = engine
-		DBSession = sessionmaker(bind=engine)
-		session = DBSession()
-		t = pd.read_sql(sql=query, con=engine)
+		t = pd.read_sql_table('transactions', con=engine)
 
 	return t

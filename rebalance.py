@@ -1,24 +1,15 @@
-# TODO: Find an easy way to initialize the transactions table and create the
-#		initial transactions without having to check if the table exists every time
-#		I'll worry about that later, first focus on update function
-
 import os
 import sys
 import time
-import ccxt
 import pandas as pd
 import numpy as np
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 from database import init_db, db_session, engine
 from models import Transaction
 from functions import exchange, coin_price
 
-
+thresh = 0.01
 
 try:
-
 
 	while True:
 		balance = exchange.fetchBalance()
@@ -28,17 +19,16 @@ try:
 				 for asset in balance['info']['balances']
 				 if float(asset['free']) > 0.01 and asset['asset'] != 'GAS']
 
+		n = 1/len(coins)
+
 		quantities, dollar_values = [], []
 
 		quantities = np.array([balance[coin]['total'] for coin in coins])
 		d_vals = np.array([quantities[i] * coin_price(coins[i]) for i in range(len(coins))])
 
+		if (dollar_values.max() - dollar_values.min()) / dollar_values.sum() < 2 * n * thresh:
+			break
 
-
-		for coin in coins:
-			quantity = balance[coin]['total']
-			quantities.append(quantity)
-			dollar_values.append(quantity * coin_price(exchange, coin))
 
 
 
@@ -49,24 +39,7 @@ except:
 		   correct api text file and are not using a network proxy, and try again')
 
 
-n = 1/(len(coins))
-thresh = .02
-i = 0
 
-
-
-
-
-	# Line comprehension of above loop - should I use this instead and make another
-	# line comprehension for quantities? Or is it better visually to keep the current method?
-	# dollar_values = np.array([balance[coin]['total'] * coin_price(coin) for coin in coins])
-
-	# Convert our lists to np arrays since our lists don't work well with mathematical operations
-	quantities = np.array(quantities)
-	dollar_values = np.array(dollar_values)
-
-	if (dollar_values.max() - dollar_values.min()) / dollar_values.sum() < 2 * n * thresh:
-		break
 
 
 
@@ -102,10 +75,3 @@ i = 0
 
 		# Update SQL database
 		transactions = Update(dual_trade, trade_coins, trade_sides, trade_quantities, transactions, session)
-
-print('Rebalance complete.')
-print('# of trades executed: ', i)
-# Print trades that are executed
-if i > 0:
-	print(transactions.loc[transactions['trade_num'] > max(transactions['trade_num'] - 1)])
-time.sleep(10)
