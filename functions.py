@@ -15,3 +15,14 @@ def coin_price(coin):
 		price = btc_ratio * btc_price
 
 	return price
+
+def determine_ticker(coin1, coin2):
+	try:
+		exchange.fetch_ticker(coin1 + '/' + coin2)
+		return [coin1 + '/' + coin2], ['sell']
+	except:
+		try:
+			exchange.fetch_ticker(coin2 + '/' + coin1)
+			return [coin2 + '/' + coin1], ['buy']
+		except:
+			return [coin1 + '/' + coin2, coin2 + '/' + coin1], ['sell','buy']

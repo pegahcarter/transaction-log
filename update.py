@@ -35,27 +35,28 @@ def Update(dual_trade, coins, sides, quantities, t, session):
 				realised_pct = gain_loss / cost_of_transaction
 
 			# push to SQL
-			session.add(Transactions(
-				rebalance_num = rebalance_num,
+			purchase_data = Transaction(
 				date = datetime.now(),
 				coin = coin,
 				side = side,
-				units = quantity,
-				price_per_unit = trade_dollars / quantity,
-				fees = dollar_value * .0075,
+				units = units,
+				price_per_unit = coin_price(coin),
+				fees = fees,
 				previous_units = previous_units,
 				cumulative_units = cumulative_units,
-				transacted_value = transacted_value,
+				transacted_value = d_amt,
 				previous_cost = previous_cost,
 				cost_of_transaction = cost_of_transaction,
 				cost_per_unit = cost_per_unit,
 				cumulative_cost = cumulative_cost,
 				gain_loss = gain_loss,
 				realised_pct = realised_pct
-			))
-			session.commit()
+			)
 
-				# Don't log the BTC transaction if it's a dual trade
+			db_session.add(purchase_data)
+			db_session.commit()
+
+			# Don't log the BTC transaction if it's a dual trade
 			if dual_trade:
 				break
 

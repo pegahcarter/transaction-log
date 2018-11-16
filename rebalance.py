@@ -26,8 +26,16 @@ try:
 		quantities = np.array([balance[coin]['total'] for coin in coins])
 		d_vals = np.array([quantities[i] * coin_price(coins[i]) for i in range(len(coins))])
 
-		if (dollar_values.max() - dollar_values.min()) / dollar_values.sum() < 2 * n * thresh:
+		if (d_vals.max() - d_vals.min()) / d_vals.sum() < 2 * n * thresh:
 			break
+
+		# Determine if there's a trade ratio between the coins, or if we need to convert to BTC first
+		ticker, side = determine_ticker(coins[dollar_values.argmin()], coins[dollar_values.argmax()])
+
+		# Reference so that BTC won't be documented in the dual trade.
+		dual_trade = None
+		if len(ticker) > 1:
+			dual_trade = True
 
 
 
@@ -42,29 +50,12 @@ except:
 
 
 
-
-
-	# Determine if there's a trade ratio between the coins, or if we need to convert to BTC first
-	tickers = determine_ticker(exchange, coins[dollar_values.argmin()], coins[dollar_values.argmax()])
-
-	# Reference so that BTC won't be documented in the dual trade.
-	if len(tickers) > 2:
-		dual_trade = True
-	else:
-		dual_trade = False
-
 	weight_to_move = min([dollar_values.max()/dollar_values.sum() - n, n - dollar_values.min()/dollar_values.sum()])
 	trade_dollars = weight_to_move * dollar_values.sum()
 
 	for x in range(0,len(tickers),2):
 		ratio = tickers[x]
 		trade_coins = ratio.split('/')
-
-		side = tickers[x+1]
-		if side == 'sell':
-			trade_sides = ['sell', 'buy']
-		else:
-			trade_sides = ['buy', 'sell']
 
 		# Easier way to reference both coins in our dollar_values list at the same time
 		indices = [coins.index(trade_coins[0]), coins.index(trade_coins[1])]

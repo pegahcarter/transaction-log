@@ -147,5 +147,3 @@ for day in range(1, len(hist_prices)):
 
 			db_session.add(sim_purchase)
 			db_session.commit()
-
-#transactions.loc[transactions['previous_cost'] < 100]
