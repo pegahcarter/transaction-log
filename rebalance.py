@@ -11,17 +11,19 @@ thresh = 0.01
 
 try:
 
+
 	while True:
 		balance = exchange.fetchBalance()
 
 		# update coin information
-		coins = [asset['asset']
-				 for asset in balance['info']['balances']
-				 if float(asset['free']) > 0.01 and asset['asset'] != 'GAS']
+		coins = [
+			asset['asset']
+			for asset in balance['info']['balances']
+			if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
+		]
+			# NOTE: are the parenthesis necessary?
 
 		n = 1/len(coins)
-
-		quantities, dollar_values = [], []
 
 		quantities = np.array([balance[coin]['total'] for coin in coins])
 		d_vals = np.array([quantities[i] * coin_price(coins[i]) for i in range(len(coins))])
@@ -29,16 +31,24 @@ try:
 		if (d_vals.max() - d_vals.min()) / d_vals.sum() < 2 * n * thresh:
 			break
 
+
 		# Determine if there's a trade ratio between the coins, or if we need to convert to BTC first
-		ticker, side = determine_ticker(coins[dollar_values.argmin()], coins[dollar_values.argmax()])
+		tickers, sides = determine_ticker(coins[dollar_values.argmin()], coins[dollar_values.argmax()])
 
 		# Reference so that BTC won't be documented in the dual trade.
 		dual_trade = None
 		if len(ticker) > 1:
 			dual_trade = True
 
+		# quantity traded - use find('/') in the ticker, find the index of that coin in the
+		# list of coins, then find the corresponding quantity with that index
+		quantity = quantities[]
 
+		# execute trade
+		for ticker, side in zip(tickers, side):
+			exchange.create_order(symbol, 'market', side, quantity)
 
+		# call update function for SQL databsse
 
 
 
@@ -65,4 +75,4 @@ except:
 		exchange.create_order(ratio, 'market', side, trade_quantities[0])
 
 		# Update SQL database
-		transactions = Update(dual_trade, trade_coins, trade_sides, trade_quantities, transactions, session)
+		transactions = Update()
