@@ -9,8 +9,6 @@ def coin_price(coin):
 	btc_price = float(exchange.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 	if coin == 'BTC':
 		price = btc_price
-	elif coin == 'DOGE':
-		price = float(exchange.fetch_ticker('DOGE/USDT')['info']['lastPrice'])
 	else:
 		btc_ratio = float(exchange.fetch_ticker(coin + '/BTC')['info']['lastPrice'])
 		price = btc_ratio * btc_price
@@ -18,111 +16,89 @@ def coin_price(coin):
 	return price
 
 
-def find_sides(ticker):
-	if ticker.split('/')[0] == light_coin:
+def find_sides(numerator, l_coin):
+	'''Returns a tuple where the tuple[0] is the side of our trade and tuple[1]
+	lets us document the other side of the trade in $
+
+	numerator 	- coin before the '/' in the ticker
+	l_coin		- coin with the lowest total $ value in our portfolio
+	'''
+	if numerator == l_coin:
 		return 'buy', 'sell'
 	else:
-		return 'sell', 'buy'
+		return 'sell', 'sell'
 
 
-def find_quantities(ticker, d_amt):
-	coin1, coin2 = ticker.split('/')
-	return d_amt/coin_price(coin1), d_amt/coin_price(coin2)
+def find_quantities(ratio, d_amt):
+	return d_amt/coin_price(ratio[0]), d_amt/coin_price(ratio[1])
 
 
-def find_ticker(coin1, coin2):
-	'''Determine existing coin ratio to execute trade and convert
-	to BTC first if there isn't a ratio (like XRP/OMG)
+def find_tickers(coins):
+	'''Determines if there is an existing coin ratio to execute trade.
+	If there isn't a ratio, convert	to BTC first (like XRP/OMG)
 	'''
 	try:
-		exchange.fetch_ticker(coin1 + '/' + coin2)
-		return [coin1 + '/' + coin2]
+		exchange.fetch_ticker(coins[0] + '/' + coins[1])
+		return [[coins[0], coins[1]]]
 	except:
 		try:
-			exchange.fetch_ticker(coin2 + '/' + coin1)
-			return [coin2 + '/' + coin1]
+			exchange.fetch_ticker(coins[1] + '/' + coins[0])
+			return [[coins[1], coins[0]]]
 		except:
-			return [coin1 + '/BTC', coin2 + '/BTC']
+			return [[coins[0], 'BTC'], [coins[1], 'BTC']]
 
 
-# ---------------------------------------------------------------------------- #
-def update_transactions(tickers, dollar_amt):
+def update_transactions(coin, prev_amt, prev_cost, side, quantity, dollar_value):
 	'''Documents transaction data to SQL table
-	tickers - list of either one coin ratio or two
-	dollar_amt - dollar value of trade
+
+	coin 			- coin we're documenting for the trade
+	prev_amt 		- current quantity of the coin in our portfolio
+	prev_cost 		- current total cost of the coin in our portfolio
+	side 			- side we're executing the trade on (buy or sell)
+	quantity 		- quantity of coin to be traded
+	dollar_value 	- value of our trade in dollars
 	'''
 
-	sides = find_sides(tickers[0])
-	quantities = find_quantities(tickers[0], dollar_amt)
+	if side == 'buy':
+		cost_of_transaction = None
+		cost_per_unit = None
 
+		cumulative_cost = prev_cost + dollar_value
+		cumulative_units = prev_amt + quantity
+		gain_loss = None
+		realised_pct = None
 
-	for coin, side, quantity in zip(tickers[0].split('/'), sides, quantities[0]):
+		fees = dollar_value * .001
+	else:
+		cost_of_transaction = quantity / prev_amt * prev_cost
+		cost_per_unit = prev_cost / prev_amt
 
+		cumulative_cost = prev_cost - dollar_value
+		cumulative_units = prev_amt - quantity
+		gain_loss = dollar_value - cost_of_transaction
+		realised_pct = gain_loss / cost_of_transaction
 
-
-
+		fees = None
 
 	# Slowly fill in the ...'s once I have the values for the variables
+	purchase_data = Transaction(
+		date = datetime.datetime.now(),
+		coin = coin,
+		side = side,
+		units = quantity,
+		price_per_unit = coin_price(coin),
+		fees = fees,
+		previous_units = prev_amt,
+		cumulative_units = cumulative_units,
+		transacted_value = ...,
+		previous_cost = prev_cost,
+		cost_of_transaction = cost_of_transaction,
+		cost_per_unit = cost_per_unit,
+		cumulative_cost = cumulative_cost,
+		gain_loss = gain_loss,
+		realised_pct = realised_pct
+	)
 
-		purchase_data = Transaction(
-			date = datetime.datetime.now(),
-			coin = coin,
-			side = ...,
-			units = ...,
-			price_per_unit = coin_price(coin),
-			fees = ...,
-			previous_units = ...,
-			cumulative_units = ...,
-			transacted_value = ...,
-			previous_cost = ...,
-			cost_of_transaction = ...,
-			cost_per_unit = ...,
-			cumulative_cost = ...,
-			gain_loss = ...,
-			realised_pct = ...
-		)
-
-
-
-	if len(tickers) > 1:
-		 return update_transactions(tickers[1], d_amt)
-
-
-
-'''
-The tough part is that one trade is documented in different ways.
-
-For example, let's say that we want to execute a trade to sell OMG for XRP.
-That's __1__ trade.  But your exchange doesn't have that ratio, so you have to
-have one trade to convert to BTC, and one trade to buy with BTC.  Now we're at __2__
-trades.  For each trade, we can't just document the transaction from one coin to
-the other.  We have to know what each price is in USD, so that when we end up selling
-our crypto, we pay a boat load of taxes.  So instead of documenting the first trade
-of selling the OMG for BTC, we have to first document the USD we sold the OMG for,
-and the USD of the BTC we bought, at the price of the coin in that day at that time.
-
-
-
-
-
-
-purchase_data = Transaction(
--	date = datetime.now(),
--	coin = coin,
--	side = side,
-	units = quantity,
--	price_per_unit = coin_price(coin),
-	fees = fees,
-	previous_units = previous_units,
-	cumulative_units = cumulative_units,
-	transacted_value = d_amt,
-	previous_cost = previous_cost,
-	cost_of_transaction = cost_of_transaction,
-	cost_per_unit = cost_per_unit,
-	cumulative_cost = cumulative_cost,
-	gain_loss = gain_loss,
-	realised_pct = realised_pct
-)
-
-
-'''
+	# Push to SQL
+	db_session.add(sim_purchase)
+	db_session.commit()
