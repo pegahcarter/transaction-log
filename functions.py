@@ -18,19 +18,19 @@ def coin_price(coin):
 	return price
 
 
-def determine_sides(ticker):
+def find_sides(ticker):
 	if ticker.split('/')[0] == light_coin:
 		return 'buy', 'sell'
 	else:
 		return 'sell', 'buy'
 
 
-def determine_quantities(ticker, d_amt):
+def find_quantities(ticker, d_amt):
 	coin1, coin2 = ticker.split('/')
 	return d_amt/coin_price(coin1), d_amt/coin_price(coin2)
 
 
-def determine_ticker(coin1, coin2):
+def find_ticker(coin1, coin2):
 	'''Determine existing coin ratio to execute trade and convert
 	to BTC first if there isn't a ratio (like XRP/OMG)
 	'''
@@ -42,18 +42,18 @@ def determine_ticker(coin1, coin2):
 			exchange.fetch_ticker(coin2 + '/' + coin1)
 			return [coin2 + '/' + coin1]
 		except:
-			return [coin1 + '/' + coin2, coin2 + '/' + coin1]
+			return [coin1 + '/BTC', coin2 + '/BTC']
 
 
-
+# ---------------------------------------------------------------------------- #
 def update_transactions(tickers, dollar_amt):
 	'''Documents transaction data to SQL table
 	tickers - list of either one coin ratio or two
 	dollar_amt - dollar value of trade
 	'''
 
-	sides = determine_sides(tickers[0])
-	quantities = determine_quantities(tickers[0], dollar_amt)
+	sides = find_sides(tickers[0])
+	quantities = find_quantities(tickers[0], dollar_amt)
 
 
 	for coin, side, quantity in zip(tickers[0].split('/'), sides, quantities[0]):
