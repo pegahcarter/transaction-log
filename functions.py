@@ -18,54 +18,74 @@ def coin_price(coin):
 	return price
 
 
+def determine_sides(ticker):
+	if ticker.split('/')[0] == light_coin:
+		return 'buy', 'sell'
+	else:
+		return 'sell', 'buy'
+
+
+def determine_quantities(ticker, d_amt):
+	coin1, coin2 = ticker.split('/')
+	return d_amt/coin_price(coin1), d_amt/coin_price(coin2)
+
+
 def determine_ticker(coin1, coin2):
 	'''Determine existing coin ratio to execute trade and convert
 	to BTC first if there isn't a ratio (like XRP/OMG)
 	'''
 	try:
 		exchange.fetch_ticker(coin1 + '/' + coin2)
-		return [coin1 + '/' + coin2], ['buy']
+		return [coin1 + '/' + coin2]
 	except:
 		try:
 			exchange.fetch_ticker(coin2 + '/' + coin1)
-			return [coin2 + '/' + coin1], ['sell']
+			return [coin2 + '/' + coin1]
 		except:
-			return [coin1 + '/' + coin2, coin2 + '/' + coin1], ['buy','sell']
+			return [coin1 + '/' + coin2, coin2 + '/' + coin1]
 
-# Function to document transaction to sql
-def update_transactions(dual_trade, coins, sides, quantities):
+
+
+def update_transactions(tickers, dollar_amt):
 	'''Documents transaction data to SQL table
-	dual_trade - Boolean,
-	coins - list of either one coin ratio or two
-	sides - list of either one side or two
-	quantities - tuple of the coin quantities we're buying/selling
-
+	tickers - list of either one coin ratio or two
+	dollar_amt - dollar value of trade
 	'''
 
+	sides = determine_sides(tickers[0])
+	quantities = determine_quantities(tickers[0], dollar_amt)
 
-	# Plan for below:  Slowly fill in the ...'s once I have the values for the variables
 
-	purchase_data = Transaction(
-		date = datetime.datetime.now(),
-		coin = ...,
-		side = ...,
-		units = ...,
-		price_per_unit = ...,
-		fees = ...,
-		previous_units = ...,
-		cumulative_units = ...,
-		transacted_value = ...,
-		previous_cost = ...,
-		cost_of_transaction = ...,
-		cost_per_unit = ...,
-		cumulative_cost = ...,
-		gain_loss = ...,
-		realised_pct = ...
-	)
+	for coin, side, quantity in zip(tickers[0].split('/'), sides, quantities[0]):
 
 
 
 
+
+	# Slowly fill in the ...'s once I have the values for the variables
+
+		purchase_data = Transaction(
+			date = datetime.datetime.now(),
+			coin = coin,
+			side = ...,
+			units = ...,
+			price_per_unit = coin_price(coin),
+			fees = ...,
+			previous_units = ...,
+			cumulative_units = ...,
+			transacted_value = ...,
+			previous_cost = ...,
+			cost_of_transaction = ...,
+			cost_per_unit = ...,
+			cumulative_cost = ...,
+			gain_loss = ...,
+			realised_pct = ...
+		)
+
+
+
+	if len(tickers) > 1:
+		 return update_transactions(tickers[1], d_amt)
 
 
 
@@ -104,8 +124,5 @@ purchase_data = Transaction(
 	realised_pct = realised_pct
 )
 
-	if not dual trade:
-		 return
 
-	update_transactions(False, ..., ..., ...)
 '''
