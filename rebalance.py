@@ -3,13 +3,25 @@ import sys
 import time
 import pandas as pd
 import numpy as np
+import ccxt
 from database import engine
 from functions import coin_price
+
+with open('api.txt', 'r') as f:
+	api = f.readlines()
+	apiKey = api[0][:len(api[0])-1]
+	secret = api[1][:len(api[1])]
 
 thresh = 0.01
 
 try:
 	while True:
+		exchange = ccxt.binance({
+			'options': {'adjustForTimeDifference': True},
+			'apiKey': apiKey,
+			'secret': secret
+		})
+
 		balance = exchange.fetchBalance()
 
 		# update coin information
@@ -47,6 +59,7 @@ try:
 
 		for ticker in tickers:
 			df = pd.read_sql_table('transactions', con=engine)
+			# TODO: function to add a new coin to table
 
 			sides = find_sides(ticker[0], l_coin)
 			quantities = find_quantities(ticker, d_amt)

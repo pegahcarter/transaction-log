@@ -1,4 +1,3 @@
-#TODO: figure out if I need to update exchange every time, or just fetchBalance()
 from database import db_session, engine
 from models import Transaction
 from exchange import exchange
@@ -18,7 +17,7 @@ def coin_price(coin):
 
 def find_sides(numerator, l_coin):
 	'''Returns a tuple where the tuple[0] is the side of our trade and tuple[1]
-	lets us document the other side of the trade in $
+	is for when we document the other side of the trade
 
 	numerator 	- coin before the '/' in the ticker
 	l_coin		- coin with the lowest total $ value in our portfolio
@@ -26,7 +25,7 @@ def find_sides(numerator, l_coin):
 	if numerator == l_coin:
 		return 'buy', 'sell'
 	else:
-		return 'sell', 'sell'
+		return 'sell', 'buy'
 
 
 def find_quantities(ratio, d_amt):
@@ -80,7 +79,6 @@ def update_transactions(coin, prev_amt, prev_cost, side, quantity, dollar_value)
 
 		fees = None
 
-	# Slowly fill in the ...'s once I have the values for the variables
 	purchase_data = Transaction(
 		date = datetime.datetime.now(),
 		coin = coin,
@@ -90,7 +88,7 @@ def update_transactions(coin, prev_amt, prev_cost, side, quantity, dollar_value)
 		fees = fees,
 		previous_units = prev_amt,
 		cumulative_units = cumulative_units,
-		transacted_value = ...,
+		transacted_value = dollar_value,
 		previous_cost = prev_cost,
 		cost_of_transaction = cost_of_transaction,
 		cost_per_unit = cost_per_unit,
