@@ -10,9 +10,9 @@ from datetime import datetime
 import ccxt
 
 # BTC, ETH, XRP, LTC coins to start
-coins = ['BTC','ETH', 'LTC']
+coins = ['BTC','ETH','XRP','LTC','BCH']
 
-hist_prices = pd.read_csv('data/historical_prices.csv')
+hist_prices = pd.read_csv('data/historical/prices.csv')
 dates = hist_prices['date']
 hist_prices = np.array(hist_prices[coins])
 
