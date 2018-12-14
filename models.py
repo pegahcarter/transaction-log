@@ -1,7 +1,7 @@
+import pandas as pd
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
-from database import Base
+from database import Base, hist_prices
 from datetime import datetime
-
 
 class Portfolio(object):
 	def __init__(self, coins):
@@ -13,7 +13,6 @@ class Portfolio(object):
 		# Include a 1% slippage rate and 0.1% trading fee
 		self.quantities[buy_index] += (dollar_amt / current_prices[buy_index] * 0.989)
 		self.quantities[sell_index] += (dollar_amt / current_prices[sell_index])
-
 
 
 class Transaction(Base):

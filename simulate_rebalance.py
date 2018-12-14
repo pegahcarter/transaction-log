@@ -1,4 +1,4 @@
-from database import db_session, engine, init_db
+from database import db_session, engine, init_db, hist_prices
 from models import Transaction
 from functions import coin_price
 from flask import Flask, request, render_template, redirect
@@ -9,25 +9,20 @@ import numpy as np
 from datetime import datetime
 import ccxt
 
-# BTC, ETH, XRP, LTC coins to start
-coins = ['BTC','ETH','XRP','LTC','BCH']
-
-hist_prices = pd.read_csv('data/historical/prices.csv')
-dates = hist_prices['date']
-hist_prices = np.array(hist_prices[coins])
-
-# Limit to one year of data
-hist_prices = hist_prices[:365]
-dates = dates[:365]
+# BTC, ETH, XRP, LTC, XLM coins to start
+coins = ['BTC','ETH','XRP','LTC','XLM']
+timestamps = hist_prices['timestamp']
 
 fees = 0
 rate = 0.005
 start_amt = 5000
-thresh = 0.01
-avg_weight = 1 / len(coins)
-weighted_thresh = (avg_weight * thresh)
+avg_weight = 0.2
+weighted_thresh = .001
 
 amt_each = start_amt / len(coins)
+
+myPortfolio = Portfolio(coins)
+
 starting_prices = hist_prices[0]
 coin_amts = amt_each / starting_prices
 

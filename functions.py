@@ -1,4 +1,4 @@
-from database import db_session, engine
+from database import db_session, engine, hist_prices
 from models import Transaction
 from exchange import exchange
 import datetime
