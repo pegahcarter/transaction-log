@@ -1,7 +1,7 @@
-from database import db_session, engine, hist_prices
-from models import Transaction
-from exchange import exchange
+from database import db_session
+from models import Transaction, Portfolio
 import datetime
+import ccxt
 
 def coin_price(coin):
 	'''Returns the current dollar price of the coin in question'''

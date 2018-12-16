@@ -1,12 +1,41 @@
 import pandas as pd
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
 from database import Base, hist_prices
+from functions import coin_price
 from datetime import datetime
+import ccxt
+
+
+with open('api.txt', 'r') as f:
+	api = f.readlines()
+	apiKey = api[0][:len(api[0])-1]
+	secret = api[1][:len(api[1])]
 
 class Portfolio(object):
-	def __init__(self, coins):
+
+	def __init__(self):
+
+		exchange = ccxt.binance({
+			'options': {'adjustForTimeDifference': True},
+			'apiKey': apiKey,
+			'secret': secret
+		})
+		balance = exchange.fetchBalance()
+
+		coins = [
+			asset['asset']
+			for asset in balance['info']['balances']
+			if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
+		]
+
+		quantities = [balance[coin]['total'] for coin in coins]
+		current_prices = [coin_price(coin) for coin in coins]
+
 		self.coins = coins
-		self.quantities = [1000 / hist_prices[coin][0] for coin in coins]
+		self.quantities = quantities
+		self.current_prices = current_prices
+		self.dollar_values = quantities * current_prices
+
 
 	def execute_trade(self, coin_indices, dollar_amt, current_prices):
 		buy_index, sell_index = coin_indices
@@ -15,12 +44,23 @@ class Portfolio(object):
 		self.quantities[sell_index] += (dollar_amt / current_prices[sell_index])
 
 
+
+
+
+
+
+
+
+
+
+
+
 class Transaction(Base):
 	__tablename__ = 'transactions'
 
 	trade_num = Column(Integer, primary_key=True)
 	date = Column(DateTime, default=datetime.utcnow)
-	coin = Column(String(10))
+	coin = Column(String(10), ForeignKey=True)
 	side = Column(String(10))
 	units = Column(Float(10,2))
 	price_per_unit = Column(Float(10,2))
@@ -70,6 +110,3 @@ class Transaction(Base):
 		self.cumulative_cost = cumulative_cost
 		self.gain_loss = gain_loss
 		self.realised_pct = realised_pct
-
-	def __repr__(self):
-		return('<Transactions %r>' % (self.trade_num))

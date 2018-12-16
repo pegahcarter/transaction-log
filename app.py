@@ -1,11 +1,10 @@
 from database import db_session, engine
-from models import Transaction
+from models import Transaction, Portfolio
 from functions import coin_price
 from flask import Flask, request, render_template, redirect
-from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 from datetime import datetime
 import pandas as pd
-# import plotly
+
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
