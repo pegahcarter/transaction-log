@@ -16,7 +16,7 @@ def coin_price(coin):
 
 
 def find_sides(numerator, l_coin):
-	'''Returns a tuple where the tuple[0] is the side of our trade and tuple[1]
+	''' Returns a tuple where the tuple[0] is the side of our trade and tuple[1]
 	is for when we document the other side of the trade
 
 	numerator 	- coin before the '/' in the ticker
@@ -28,23 +28,23 @@ def find_sides(numerator, l_coin):
 		return 'sell', 'buy'
 
 
-def find_quantities(ratio, d_amt):
-	return d_amt/coin_price(ratio[0]), d_amt/coin_price(ratio[1])
+# def find_quantities(ratio, d_amt):
+# 	return d_amt/coin_price(ratio[0]), d_amt/coin_price(ratio[1])
 
 
-def find_tickers(coins):
-	'''Determines if there is an existing coin ratio to execute trade.
-	If there isn't a ratio, convert	to BTC first (like XRP/OMG)
+def find_tickers(coin1, coin2):
+	'''Determines the coin pair needed to execute the trade.
+	If there isn't a pair, convert to BTC first (like XRP/OMG)
 	'''
 	try:
-		exchange.fetch_ticker(coins[0] + '/' + coins[1])
-		return [[coins[0], coins[1]]]
+		exchange.fetch_ticker(coin1 + '/' + coin2)
+		return [[coin1, coin2]]
 	except:
 		try:
-			exchange.fetch_ticker(coins[1] + '/' + coins[0])
-			return [[coins[1], coins[0]]]
+			exchange.fetch_ticker(coin2 + '/' + coin1)
+			return [[coin2, coin1]]
 		except:
-			return [[coins[0], 'BTC'], [coins[1], 'BTC']]
+			return [[coin1, 'BTC'], [coin2, 'BTC']]
 
 
 def update_transactions(coin, prev_amt, prev_cost, side, quantity, dollar_value):

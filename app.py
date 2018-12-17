@@ -1,4 +1,4 @@
-from database import db_session, engine
+import database
 from models import Transaction, Portfolio
 from functions import coin_price
 from flask import Flask, request, render_template, redirect

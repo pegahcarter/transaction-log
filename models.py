@@ -6,14 +6,24 @@ from datetime import datetime
 import ccxt
 
 
-with open('api.txt', 'r') as f:
-	api = f.readlines()
-	apiKey = api[0][:len(api[0])-1]
-	secret = api[1][:len(api[1])]
 
 class Portfolio(object):
+	''' Represents our account balance on Binance
+
+	coins           - list of coin names we are invested in
+	quantities      - list of the quantities for each coin held
+	current_prices  - list of the most recent dollar price for each coin held
+	dollar_values   - list of the dollar values for each coin held (quantities * current_prices)
+
+	'''
 
 	def __init__(self):
+		# Connect to our exchange API and fetch our account balance
+		# TODO: update this file reference
+		with open('api.txt', 'r') as f:
+			api = f.readlines()
+			apiKey = api[0][:len(api[0])-1]
+			secret = api[1][:len(api[1])]
 
 		exchange = ccxt.binance({
 			'options': {'adjustForTimeDifference': True},
@@ -28,13 +38,20 @@ class Portfolio(object):
 			if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
 		]
 
-		quantities = [balance[coin]['total'] for coin in coins]
+		quantities = np.array([balance[coin]['total'] for coin in coins])
 		current_prices = [coin_price(coin) for coin in coins]
 
 		self.coins = coins
 		self.quantities = quantities
 		self.current_prices = current_prices
 		self.dollar_values = quantities * current_prices
+
+
+	def outlier_coins(self):
+		return (
+			self.coins[self.dollar_values.argmin()],
+			self.coins[self.dollar_values.argmax())]
+		)
 
 
 	def execute_trade(self, coin_indices, dollar_amt, current_prices):
@@ -45,17 +62,9 @@ class Portfolio(object):
 
 
 
-
-
-
-
-
-
-
-
-
-
 class Transaction(Base):
+	''' Represents a trade executed between two coins '''
+
 	__tablename__ = 'transactions'
 
 	trade_num = Column(Integer, primary_key=True)
@@ -77,22 +86,22 @@ class Transaction(Base):
 
 	def __init__(
 		self,
-		trade_num=None,
-		date=None,
-		coin=None,
-		side=None,
-		units=None,
-		price_per_unit=None,
-		fees=None,
-		previous_units=None,
-		cumulative_units=None,
-		transacted_value=None,
-		previous_cost=None,
-		cost_of_transaction=None,
-		cost_per_unit=None,
-		cumulative_cost=None,
-		gain_loss=None,
-		realised_pct=None):
+		trade_num,
+		date,
+		coin,
+		side,
+		units,
+		price_per_unit,
+		fees,
+		previous_units,
+		cumulative_units,
+		transacted_value,
+		previous_cost,
+		cost_of_transaction,
+		cost_per_unit,
+		cumulative_cost,
+		gain_loss,
+		realised_pct):
 
 		self.trade_num = trade_num
 		self.date = date

@@ -3,32 +3,27 @@ import sys
 import time
 import pandas as pd
 import numpy as np
-import models
+from models import Portfolio, Transaction
 import database
 from functions import coin_price
 
 def rebalance():
 
 	myPortfolio = Portfolio()
+	n = 1/len(myPortfolio.coins)
+	thresh = 0.02
 
-	n = 1/len(coins)
-
+	d_vals = myPortfolio.dollar_values
 	# We'll take the coins with the highest and lowest dollar value to
 	# test our threshold
 	weight_diffs = [n - min(d_vals)/sum(d_vals), max(d_vals)/sum(d_vals) - n]
-	weight = min(weight_diffs)
 
-	if weight < 2 * n * thresh:
-		break
+	if min(weight_diffs) < 2 * n * thresh:
+		return
 
-	d_amt = weight * sum(d_vals)
+	d_amt = min(weight_diffs) * sum(d_vals)
 
-	# Names of coins we're trading
-	coins_to_trade = coins[dollar_values.argmin()], coins[dollar_values.argmax()]
-
-	# Determine if there's a trade ratio between the coins, or if we need
-	# to convert to BTC first
-	tickers = find_tickers(coins_to_trade)
+	tickers = find_tickers(myPortfolio.outlier_coins())
 
 	for ticker in tickers:
 		df = pd.read_sql_table('transactions', con=engine)
@@ -44,6 +39,9 @@ def rebalance():
 			prev_amt, prev_cost = df[df['coin'] == coin][['cumulative_units', 'cumulative_cost']].iloc[-1, :]
 
 			update_transactions(coin, prev_amt, prev_cost, side, quantity, d_amt)
+
+
+	return rebalance()
 
 # except:
 # 	sys.exit('Error connecting to API socket.  Please ensure you are opening the \
