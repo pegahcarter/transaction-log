@@ -2,7 +2,6 @@ from database import db_session, engine, init_db, hist_prices
 from models import Transaction
 from functions import coin_price
 from flask import Flask, request, render_template, redirect
-from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 from datetime import datetime
 import pandas as pd
 import numpy as np

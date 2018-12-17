@@ -6,7 +6,6 @@ from datetime import datetime
 import ccxt
 
 
-
 class Portfolio(object):
 	''' Represents our account balance on Binance
 
@@ -45,22 +44,13 @@ class Portfolio(object):
 		self.quantities = quantities
 		self.current_prices = current_prices
 		self.dollar_values = quantities * current_prices
-
-
-	def outlier_coins(self):
-		return (
-			self.coins[self.dollar_values.argmin()],
-			self.coins[self.dollar_values.argmax())]
-		)
-
-
-	def execute_trade(self, coin_indices, dollar_amt, current_prices):
-		buy_index, sell_index = coin_indices
-		# Include a 1% slippage rate and 0.1% trading fee
-		self.quantities[buy_index] += (dollar_amt / current_prices[buy_index] * 0.989)
-		self.quantities[sell_index] += (dollar_amt / current_prices[sell_index])
-
-
+		self.cost = []
+		self.cost_per_unit = []
+		self.unrealised_amt = []
+		self.unrealised_pct = []
+		self.realised_amt = []
+		self.gain_loss = []
+		
 
 class Transaction(Base):
 	''' Represents a trade executed between two coins '''
