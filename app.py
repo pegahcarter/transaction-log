@@ -1,6 +1,6 @@
-from database import init_db, refresh_df
+from database import init_db
 from models import Transaction, Portfolio
-from functions import coin_price
+from functions import coin_price, refresh_df
 from flask import Flask, request, render_template, redirect
 from datetime import datetime
 import pandas as pd

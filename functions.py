@@ -1,11 +1,32 @@
-from database import refresh_df
+from sqlalchemy import create_engine
 from models import Transaction
 import pandas as pd
 import datetime
 import ccxt
 
+def connect_to_exchange():
+	# Connect to our exchange API and fetch our account balance
+	with open('../../api.txt', 'r') as f:
+		api = f.readlines()
+		apiKey = api[0][:-1]
+		secret = api[1][:-1]
+
+	exchange = ccxt.binance({
+		'options': {'adjustForTimeDifference': True},
+		'apiKey': apiKey,
+		'secret': secret
+	})
+	return exchange
+
+def refresh_df():
+	engine = create_engine('sqlite:///data/transactions.db')
+	df = pd.read_sql_table('transactions', con=engine)
+	return df
+
+
 def coin_price(coin):
 	'''Returns the current dollar price of the coin in question'''
+	exchange = connect_to_exchange()
 	btc_price = float(exchange.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 	if coin == 'BTC':
 		price = btc_price
@@ -38,6 +59,8 @@ def find_tickers(myPortfolio):
 	'''Determines the coin pair needed to execute the trade.
 	If there isn't a pair, convert to BTC first (like XRP/OMG)
 	'''
+	exchange = connect_to_exchange()
+
 	coin1 = myPortfolio.coins[myPortfolio.dollar_values.argmin()]
 	coin2 = myPortfolio.coins[myPortfolio.dollar_values.argmax()]
 
@@ -52,31 +75,9 @@ def find_tickers(myPortfolio):
 			return [[coin1, 'BTC'], [coin2, 'BTC']]
 
 
-def add_coin_to_transactions(coin, quantity, current_price):
-	db_session.add(
-		Transaction(
-					date = datetime.datetime.now(),
-					coin = coin,
-					side = 'buy',
-					units = quantity,
-					price_per_unit = current_price,
-					fees = current_price * quantity * 0.00075,
-					previous_units = 0,
-					cumulative_units = quantity,
-					transacted_value = current_price * quantity,
-					previous_cost = 0,
-					cost_of_transaction = None,
-					cost_per_unit = None,
-					cumulative_cost = current_price * quantity,
-					gain_loss = 0,
-					realised_pct = None
-		)
-	)
-	db_session.commit()
-
-
 def execute_trade(d_amt, myPortfolio):
 
+	exchange = connect_to_exchange()
 	tickers = find_tickers(myPortfolio)
 
 	for ticker in tickers:
@@ -91,6 +92,22 @@ def execute_trade(d_amt, myPortfolio):
 			update_transactions(coin, side, quantity, d_amt)
 
 
+def add_coin_to_transactions(coin, quantity):
+	current_price = coin_price(coin)
+	myTransaction = Transaction(
+		coin = coin,
+		side = 'buy',
+		units = quantity,
+		price_per_unit = current_price,
+		fees = current_price * quantity * 0.00075,
+		cumulative_units = quantity,
+		transacted_value = current_price * quantity,
+		cumulative_cost = current_price * quantity
+	)
+
+	db_session.add(myTransaction)
+	db_session.commit()
+
 
 def update_transactions(coin, side, quantity, dollar_value):
 	'''Documents transaction data to SQL table
@@ -102,46 +119,35 @@ def update_transactions(coin, side, quantity, dollar_value):
 	'''
 
 	df = refresh_df()
-	prev_amt, prev_cost = df[df['coin'] == coin][['cumulative_units', 'cumulative_cost']].iloc[-1, :]
+	previous_units, previous_cost = df[df['coin'] == coin][['cumulative_units', 'cumulative_cost']].iloc[-1, :]
 
 	if side == 'buy':
-		cost_of_transaction = None
-		cost_per_unit = None
-
-		cumulative_cost = prev_cost + dollar_value
-		cumulative_units = prev_amt + quantity
-		gain_loss = None
-		realised_pct = None
-
-		fees = dollar_value * .0075
-	else:
-		cost_of_transaction = quantity / prev_amt * prev_cost
-		cost_per_unit = prev_cost / prev_amt
-
-		cumulative_cost = prev_cost - dollar_value
-		cumulative_units = prev_amt - quantity
-		gain_loss = dollar_value - cost_of_transaction
-		realised_pct = gain_loss / cost_of_transaction
-
-		fees = None
-
-	db_session.add(
-		Transaction(
-					date = datetime.datetime.now(),
-					coin = coin,
-					side = side,
-					units = quantity,
-					price_per_unit = coin_price(coin),
-					fees = fees,
-					previous_units = prev_amt,
-					cumulative_units = cumulative_units,
-					transacted_value = dollar_value,
-					previous_cost = prev_cost,
-					cost_of_transaction = cost_of_transaction,
-					cost_per_unit = cost_per_unit,
-					cumulative_cost = cumulative_cost,
-					gain_loss = gain_loss,
-					realised_pct = realised_pct
+		myTransaction = Transaction(
+			coin = coin,
+			side = side,
+			units = quantity,
+			fees = dollar_value * 0.00075,
+			previous_units = previous_units,
+			cumulative_cost = previous_cost + dollar_value,
+			cumulative_units = previous_units + quantity,
+			transacted_value = dollar_value,
+			previous_cost = previous_cost
 		)
-	)
+	else:
+		myTransaction = Transaction(
+			coin = coin,
+			side = side,
+			units = quantity,
+			previous_units = previous_units,
+			cumulative_units = prev_amt - quantity,
+			transacted_value = dollar_value,
+			previous_cost = previous_cost,
+			cost_of_transaction = quantity / previous_units * previous_cost,
+			cost_per_unit = previous_cost / previous_units,
+			cumulative_cost = previous_cost - dollar_value,
+			gain_loss = dollar_value - cost_of_transaction,
+			realised_pct = gain_loss / cost_of_transaction
+		)
+
+	db_session.add(myTransaction)
 	db_session.commit()
