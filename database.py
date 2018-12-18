@@ -6,13 +6,14 @@ import os.path
 import models
 from functions import refresh_df
 
-#def init_db():
 engine = create_engine('sqlite:///data/transactions.db')
 db_session = scoped_session(sessionmaker(bind=engine))
 Base = declarative_base()
 Base.query = db_session.query_property()
 
-df = refresh_df()
 
-if len(df) == 0:
-	Base.metadata.create_all(bind=engine)
+def init_db():
+	df = refresh_df()
+
+	if len(df) == 0:
+		Base.metadata.create_all(bind=engine)

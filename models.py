@@ -16,25 +16,31 @@ class Portfolio(object):
 	dollar_values   - list of the dollar values for each coin held (quantities * current_prices)
 
 	'''
+	def __init__(self, coins=None, prices=None):
 
-	def __init__(self):
+		if not prices:
+			exchange = connect_to_exchange()
+			balance = exchange.fetchBalance()
 
-		exchange = connect_to_exchange()
-		balance = exchange.fetchBalance()
+			coins = [
+				asset['asset']
+				for asset in balance['info']['balances']
+				if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
+			]
 
-		coins = [
-			asset['asset']
-			for asset in balance['info']['balances']
-			if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
-		]
+			quantities = np.array([balance[coin]['total'] for coin in coins])
+			current_prices = [coin_price(coin) for coin in coins]
 
-		quantities = np.array([balance[coin]['total'] for coin in coins])
-		current_prices = [coin_price(coin) for coin in coins]
+			self.coins = coins
+			self.quantities = quantities
+			self.current_prices = current_prices
+			self.dollar_values = quantities * current_prices
 
-		self.coins = coins
-		self.quantities = quantities
-		self.current_prices = current_prices
-		self.dollar_values = quantities * current_prices
+		else:
+
+			pass
+
+
 		self.cost = []
 		self.cost_per_unit = []
 		self.unrealised_amt = []
@@ -46,7 +52,7 @@ class Portfolio(object):
 class Transaction(Base):
 	''' Represents a trade executed between two coins '''
 
-	__tablename__ = 'transactions'
+	__tablename__ = 'Transactions'
 
 	trade_num = Column(Integer, primary_key=True)
 	date = Column(DateTime, default=datetime.datetime.utcnow)
@@ -65,34 +71,33 @@ class Transaction(Base):
 	gain_loss = Column(Float(10,2))
 	realised_pct = Column(Float(10,2))
 
-	# def __init__(
-	# 	self,
-	# 	coin=None,
-	# 	side=None,
-	# 	units=None,
-	# 	price_per_unit=None,
-	# 	cumulative_cost=None,
-	# 	fees=None,
-	# 	previous_units=0,
-	# 	cumulative_units,
-	# 	transacted_value,
-	# 	previous_cost=0,
-	# 	cost_of_transaction=None,
-	# 	cost_per_unit=None,
-	# 	gain_loss=None,
-	# 	realised_pct=None):
-	#
-	# 	self.coin = coin
-	# 	self.side = side
-	# 	self.units = units
-	# 	self.price_per_unit = coin_price(coin)
-	# 	self.fees = price_per_unit * units * 0.00075
-	# 	self.previous_units = previous_units
-	# 	self.cumulative_units = cumulative_units
-	# 	self.transacted_value = transacted_value
-	# 	self.previous_cost = previous_cost
-	# 	self.cost_of_transaction = cost_of_transaction
-	# 	self.cost_per_unit = cost_per_unit
-	# 	# self.cumulative_cost = coin_price(coin) * units
-	# 	self.gain_loss = gain_loss
-	# 	self.realised_pct = realised_pct
+	def __init__(
+		self,
+		coin=None,
+		side=None,
+		units=None,
+		fees=None,
+		previous_units=0,
+		cumulative_units,
+		transacted_value,
+		previous_cost=0,
+		cost_of_transaction=None,
+		cost_per_unit=None,
+		cumulative_cost=None,
+		gain_loss=None,
+		realised_pct=None):
+
+		self.coin = coin
+		self.side = side
+		self.units = units
+		self.price_per_unit = coin_price(coin)
+		self.fees = self.price_per_unit * units * 0.00075
+		self.previous_units = previous_units
+		self.cumulative_units = cumulative_units
+		self.transacted_value = transacted_value
+		self.previous_cost = previous_cost
+		self.cost_of_transaction = cost_of_transaction
+		self.cost_per_unit = cost_per_unit
+		self.cumulative_cost = coin_price(coin) * units
+		self.gain_loss = gain_loss
+		self.realised_pct = realised_pct

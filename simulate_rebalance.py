@@ -8,6 +8,22 @@ import numpy as np
 from datetime import datetime
 import ccxt
 
+# -----------------------------------------------------------------------------
+# New
+def simulate_rebalance(coins, interval):
+
+	hist_df = pd.read_csv("data/historical/prices.csv")
+
+	SimTransaction = Transaction()
+	SimTransaction.__tablename__ = 'simTransactions'
+
+	
+
+
+
+
+
+# -----------------------------------------------------------------------------
 # BTC, ETH, XRP, LTC, XLM coins to start
 coins = ['BTC','ETH','XRP','LTC','XLM']
 timestamps = hist_prices['timestamp']

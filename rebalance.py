@@ -1,6 +1,6 @@
 import sys
 import pandas as pd
-# from models import Portfolio
+from models import Portfolio
 from functions import execute_trade, add_coin_to_transactions, refresh_df
 
 

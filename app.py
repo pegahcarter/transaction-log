@@ -11,9 +11,8 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 @app.route('/')
 def showTransactions():
 
-	myPortfolio = init_db()
 	df = refresh_df()
-
+	myPortfolio = Portfolio()
 
 	for coin, current_price, quantity in zip(myPortfolio.coins, myPortfolio.current_prices, myPortfolio.quantities):
 
@@ -63,7 +62,7 @@ def showTransactions():
 	# 	portfolio[coin] = coin_data
 
 	transactions = Transaction.query.all()
-	return render_template('index.html', portfolio=portfolio, coins=coins, transactions=transactions)
+	return render_template('index.html', portfolio=myPortfolio, transactions=transactions)
 
 # Close database connection as soon as an operation is complete
 @app.teardown_appcontext
