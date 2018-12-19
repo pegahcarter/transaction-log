@@ -1,7 +1,10 @@
 from exchange import *
+from models import *
+from portfolio import *
 
 
 def init_transactions():
+	''' Create our transactions CSV file if it doesn't yet exist '''
 
 	myPortfolio = Portfolio()
 	try:
@@ -24,6 +27,8 @@ def init_transactions():
 		])
 		for coin in myPortfolio.coins:
 			add_coin_to_transactions(coin, Portfolio, df)
+
+	return
 
 
 def add_coin_to_transactions(coin, myPortfolio, transactions_df):

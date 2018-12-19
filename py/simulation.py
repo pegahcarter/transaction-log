@@ -1,31 +1,64 @@
-from database import db_session, engine, init_db, hist_prices
-from models import Transaction
-from functions import coin_price
-from flask import Flask, request, render_template, redirect
 from datetime import datetime
 import pandas as pd
 import numpy as np
 from datetime import datetime
 import ccxt
 
-# -----------------------------------------------------------------------------
-# New
-def simulate_rebalance(coins, interval):
+def simulation(): # TODO: add coins parameter
 
-	hist_df = pd.read_csv("data/historical/prices.csv")
-
-	SimTransaction = Transaction()
-	SimTransaction.__tablename__ = 'simTransactions'
-
-
-
-
-
-
-
-# -----------------------------------------------------------------------------
 # BTC, ETH, XRP, LTC, XLM coins to start
 coins = ['BTC','ETH','XRP','LTC','XLM']
+
+myPortfolio = SimPortfolio(coins)
+
+hist_prices = pd.read_csv('../data/historical/prices.csv')
+simulations = pd.DataFrame(index=hist_prices['timestamp'])
+transactions = pd.DataFrame(columns=[
+	'coin'
+	'side'
+	'units'
+	'fees'
+	'previous_units'
+	'cumulative_units'
+	'transacted_value'
+	'previous_cost'
+	'cost_of_transaction'
+	'cost_per_unit'
+	'cumulative_cost'
+	'gain_loss'
+	'realised_pct'
+])
+
+simulations['hodl'] = list(np.dot(hist_prices[coins], myPortfolio.quantities))
+
+intervals = {
+	1: 'hourly',
+	24: 'daily',
+	24*7: 'weekly',
+	24*30: 'monthly'
+}
+
+hist_prices_array = np.array(hist_prices)
+
+for i, interval in intervals.items():
+	hr_totals = [5000]
+
+	for hr in range(1, len(hist_prices)):
+		if hr % i == 0:
+			current_prices = hist_prices_array[hr]
+			myPortfolio = rebalance(myPortfolio, current_prices)
+
+		hr_totals.append(np.dot(current_prices, myPortfolio.quantities))
+
+	simulations[interval] = hr_totals
+
+simulations.to_csv('../data/simulations/simulations.csv')
+
+
+
+
+
+
 timestamps = hist_prices['timestamp']
 
 fees = 0

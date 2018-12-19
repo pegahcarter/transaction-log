@@ -1,3 +1,5 @@
+from exchange import *
+
 def find_sides(ticker, myPortfolio):
 	'''
 	Return a tuple where the tuple[0] is the side of our trade and tuple[1]
