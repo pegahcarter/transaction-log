@@ -1,11 +1,11 @@
 from sqlalchemy import create_engine
-from models import Transaction
 import pandas as pd
 import datetime
 import ccxt
 
 def connect_to_exchange():
-	# Connect to our exchange API and fetch our account balance
+	''' Connect to our exchange API and fetch our account balance '''
+
 	with open('../../api.txt', 'r') as f:
 		api = f.readlines()
 		apiKey = api[0][:-1]
@@ -18,14 +18,17 @@ def connect_to_exchange():
 	})
 	return exchange
 
+
 def refresh_df():
+	''' update our DataFrame with the recent transactions '''
 	engine = create_engine('sqlite:///data/transactions.db')
 	df = pd.read_sql_table('transactions', con=engine)
 	return df
 
 
 def coin_price(coin):
-	'''Returns the current dollar price of the coin in question'''
+	''' Return the current dollar price of the coin in question '''
+
 	exchange = connect_to_exchange()
 	btc_price = float(exchange.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 	if coin == 'BTC':
@@ -38,11 +41,13 @@ def coin_price(coin):
 
 
 def find_sides(ticker, myPortfolio):
-	''' Returns a tuple where the tuple[0] is the side of our trade and tuple[1]
+	'''
+	Return a tuple where the tuple[0] is the side of our trade and tuple[1]
 	is for documenting the other side of the trade
 
-	numerator 	- coin before the '/' in the ticker
+	ticker 		- the coin we are buying and the coin we are selling, combined by '/'
 	'''
+
 	numerator = ticker[:ticker.find('/')]
 	if myPortfolio.coins.index(numerator) == myPortfolio.dollar_values.argmin():
 		return 'buy', 'sell'
@@ -56,14 +61,15 @@ def find_quantities(ticker, d_amt):
 
 
 def find_tickers(myPortfolio):
-	'''Determines the coin pair needed to execute the trade.
-	If there isn't a pair, convert to BTC first (like XRP/OMG)
 	'''
-	exchange = connect_to_exchange()
+	Determine the coin pair needed to execute the trade.
+	If there isn't a pair, convert to BTC first
+	(i.e. XRP/OMG becomes XRP/BTC and OMG/BTC)
+	'''
 
+	exchange = connect_to_exchange()
 	coin1 = myPortfolio.coins[myPortfolio.dollar_values.argmin()]
 	coin2 = myPortfolio.coins[myPortfolio.dollar_values.argmax()]
-
 	try:
 		exchange.fetch_ticker(coin1 + '/' + coin2)
 		return [[coin1, coin2]]
@@ -76,6 +82,10 @@ def find_tickers(myPortfolio):
 
 
 def execute_trade(d_amt, myPortfolio):
+	''' Execute trade on exchange to rebalance, and document said trade to transactions
+
+	d_amt 			- dollar value of trade
+	'''
 
 	exchange = connect_to_exchange()
 	tickers = find_tickers(myPortfolio)
@@ -93,6 +103,13 @@ def execute_trade(d_amt, myPortfolio):
 
 
 def add_coin_to_transactions(coin, quantity):
+	'''
+	Add initial purchase of coin to transactions table
+
+	coin		- coin we're adding
+	quantity	- quantity of coin originally purchased
+	'''
+
 	current_price = coin_price(coin)
 	myTransaction = Transaction(
 		coin = coin,
@@ -115,7 +132,8 @@ def add_coin_to_transactions(coin, quantity):
 
 
 def update_transactions(coin, side, quantity, dollar_value):
-	'''Documents transaction data to SQL table
+	'''
+	Document transaction data to SQL table
 
 	coin 			- coin we're documenting for the trade
 	side 			- side we're executing the trade on (buy or sell)

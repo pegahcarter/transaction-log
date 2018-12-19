@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
 from database import Base
-from functions import coin_price, connect_to_exchange
+from functions import *
 import datetime
 import ccxt
 
