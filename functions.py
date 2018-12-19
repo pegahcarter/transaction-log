@@ -98,11 +98,16 @@ def add_coin_to_transactions(coin, quantity):
 		coin = coin,
 		side = 'buy',
 		units = quantity,
-		price_per_unit = current_price,
 		fees = current_price * quantity * 0.00075,
+		previous_units = 0,
 		cumulative_units = quantity,
 		transacted_value = current_price * quantity,
-		cumulative_cost = current_price * quantity
+		previous_cost = 0,
+		cost_of_transaction = None,
+		cost_per_unit=None,
+		cumulative_cost = current_price * quantity,
+		gain_loss=None,
+		realised_pct=None
 	)
 
 	db_session.add(myTransaction)
@@ -128,16 +133,21 @@ def update_transactions(coin, side, quantity, dollar_value):
 			units = quantity,
 			fees = dollar_value * 0.00075,
 			previous_units = previous_units,
-			cumulative_cost = previous_cost + dollar_value,
 			cumulative_units = previous_units + quantity,
 			transacted_value = dollar_value,
-			previous_cost = previous_cost
+			previous_cost = previous_cost,
+			cost_of_transaction=None,
+			cost_per_unit=None,
+			cumulative_cost = previous_cost + dollar_value,
+			gain_loss=None,
+			realised_pct=None
 		)
 	else:
 		myTransaction = Transaction(
 			coin = coin,
 			side = side,
 			units = quantity,
+			fees = None,
 			previous_units = previous_units,
 			cumulative_units = prev_amt - quantity,
 			transacted_value = dollar_value,

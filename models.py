@@ -16,29 +16,25 @@ class Portfolio(object):
 	dollar_values   - list of the dollar values for each coin held (quantities * current_prices)
 
 	'''
-	def __init__(self, coins=None, prices=None):
+	def __init__(self):
 
-		if not prices:
-			exchange = connect_to_exchange()
-			balance = exchange.fetchBalance()
+		exchange = connect_to_exchange()
+		balance = exchange.fetchBalance()
 
-			coins = [
-				asset['asset']
-				for asset in balance['info']['balances']
-				if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
-			]
+		coins = [
+			asset['asset']
+			for asset in balance['info']['balances']
+			if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
+		]
 
-			quantities = np.array([balance[coin]['total'] for coin in coins])
-			current_prices = [coin_price(coin) for coin in coins]
+		quantities = np.array([balance[coin]['total'] for coin in coins])
+		current_prices = [coin_price(coin) for coin in coins]
 
-			self.coins = coins
-			self.quantities = quantities
-			self.current_prices = current_prices
-			self.dollar_values = quantities * current_prices
+		self.coins = coins
+		self.quantities = quantities
+		self.current_prices = current_prices
+		self.dollar_values = quantities * current_prices
 
-		else:
-
-			pass
 
 
 		self.cost = []
@@ -73,19 +69,19 @@ class Transaction(Base):
 
 	def __init__(
 		self,
-		coin=None,
-		side=None,
-		units=None,
-		fees=None,
-		previous_units=0,
+		coin, # None
+		side, # None
+		units, # None
+		fees, # None
+		previous_units, # 0
 		cumulative_units,
 		transacted_value,
-		previous_cost=0,
-		cost_of_transaction=None,
-		cost_per_unit=None,
-		cumulative_cost=None,
-		gain_loss=None,
-		realised_pct=None):
+		previous_cost, # 0
+		cost_of_transaction, # None
+		cost_per_unit, # None
+		cumulative_cost, # None
+		gain_loss, # None
+		realised_pct): # None
 
 		self.coin = coin
 		self.side = side
