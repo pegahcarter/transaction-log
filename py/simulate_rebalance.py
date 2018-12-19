@@ -17,7 +17,7 @@ def simulate_rebalance(coins, interval):
 	SimTransaction = Transaction()
 	SimTransaction.__tablename__ = 'simTransactions'
 
-	
+
 
 
 
@@ -56,15 +56,15 @@ for i in range(len(coins)):
 		units = quantity,
 		price_per_unit = price,
 		fees = price * quantity * 0.0075,
-		previous_units = 0,
+		# previous_units = 0,
 		cumulative_units = quantity,
 		transacted_value = price * quantity,
-		previous_cost = 0,
-		cost_of_transaction = None,
-		cost_per_unit = None,
+		# previous_cost = 0,
+		# cost_of_transaction = None,
+		# cost_per_unit = None,
 		cumulative_cost = price * quantity,
-		gain_loss = 0,
-		realised_pct = None
+		# gain_loss = 0,
+		# realised_pct = None
 	)
 	db_session.add(purchase)
 	db_session.commit()
