@@ -1,6 +1,8 @@
 import pandas as pd
 import datetime
 import ccxt
+from models import *
+from transactions import *
 
 def connect_to_exchange():
 	''' Connect to our exchange API and fetch our account balance '''

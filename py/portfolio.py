@@ -1,5 +1,3 @@
-
-
 def find_sides(ticker, myPortfolio):
 	'''
 	Return a tuple where the tuple[0] is the side of our trade and tuple[1]
@@ -21,10 +19,7 @@ def find_quantities(ticker, d_amt):
 
 
 def execute_trade(d_amt, myPortfolio):
-	''' Execute trade on exchange to rebalance, and document said trade to transactions
-
-	d_amt 			- dollar value of trade
-	'''
+	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
 	exchange = connect_to_exchange()
 	tickers = find_tickers(myPortfolio)

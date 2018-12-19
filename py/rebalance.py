@@ -1,8 +1,9 @@
 import sys
 import pandas as pd
 from models import *
-from functions import *
-
+from transactions import *
+from portfolio import *
+from exchange import *
 
 def rebalance():
 
@@ -27,11 +28,5 @@ def rebalance():
 
 if __name__ == '__main__':
 
-	myPortfolio = Portfolio()
-	# df = refresh_df()
-	for coin, quantity in zip(myPortfolio.coins, myPortfolio.quantities):
-		#if coin not in df['coin']:
-		add_coin_to_transactions(coin, quantity)
-
-	# init_db()
+	init_transaction()
 	# rebalance()
