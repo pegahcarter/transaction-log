@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from exchange import *
+from exchange import connect_to_exchange
 import datetime
 
 class Portfolio(object):
@@ -39,8 +39,6 @@ class Portfolio(object):
 		# self.gain_loss = []
 
 
-
-hist_prices = pd.read_csv('data/historical/prices.csv')
 
 class SimPortfolio(object):
 

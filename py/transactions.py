@@ -1,6 +1,3 @@
-from exchange import *
-from models import *
-from portfolio import *
 
 
 def init_transactions():
@@ -11,18 +8,19 @@ def init_transactions():
 		df = pd.read_csv('../data/portfolio/transactions.csv')
 	except:
 		df = pd.DataFrame(columns=[
-			'coin'
-			'side'
-			'units'
-			'fees'
-			'previous_units'
-			'cumulative_units'
-			'transacted_value'
-			'previous_cost'
-			'cost_of_transaction'
-			'cost_per_unit'
-			'cumulative_cost'
-			'gain_loss'
+			'date',
+			'coin',
+			'side',
+			'units',
+			'fees',
+			'previous_units',
+			'cumulative_units',
+			'transacted_value',
+			'previous_cost',
+			'cost_of_transaction',
+			'cost_per_unit',
+			'cumulative_cost',
+			'gain_loss',
 			'realised_pct'
 		])
 		for coin in myPortfolio.coins:
@@ -38,6 +36,7 @@ def add_coin_to_transactions(coin, myPortfolio, transactions_df):
 	current_price = coin_price(coin)
 
 	transactions_df = transactions_df.append({
+		'date': datetime.datetime.now(),
 		'coin': coin,
 		'side': 'buy',
 		'units': quantity,
@@ -83,6 +82,7 @@ def update_transactions(coin, side, quantity, dollar_value, df):
 		realised_pct = gain_loss / cost_of_transaction
 
 	df = df.append({
+		'date': datetime.datetime.now()
 		'coin': coin,
 		'side': side,
 		'units': quantity,
