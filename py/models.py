@@ -45,4 +45,4 @@ class SimPortfolio(object):
 	def __init__(self, coins):
 		self.coins = coins
 		hist_prices = pd.read_csv('../data/historical/prices.csv')
-		self.quantities = [1000 / self.hist_prices[coin][0] for coin in coins]
+		self.quantities = [1000 / hist_prices[coin][0] for coin in coins]
