@@ -9,6 +9,9 @@ __pycache__/
 # API file
 *.txt
 
+# personal transaction data
+data/transactions/*
+
 # Distribution / packaging
 .Python
 build/
