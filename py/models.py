@@ -1,7 +1,7 @@
+import datetime
 import numpy as np
 import pandas as pd
-from exchange import connect_to_exchange
-import datetime
+import exchange
 
 class Portfolio(object):
 	'''
@@ -15,8 +15,8 @@ class Portfolio(object):
 	'''
 	def __init__(self):
 
-		exchange = connect_to_exchange()
-		balance = exchange.fetchBalance()
+		binance = exchange.connect()
+		balance = binance.fetchBalance()
 
 		coins = [
 			asset['asset']

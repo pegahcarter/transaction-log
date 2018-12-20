@@ -1,8 +1,10 @@
-from helper_functions import *
+import models
+import exchange
+import transactions
 
 def rebalance():
 
-	myPortfolio = Portfolio()
+	myPortfolio = models.Portfolio()
 	n = 1/len(myPortfolio.coins)
 	thresh = 0.02
 
@@ -16,12 +18,12 @@ def rebalance():
 
 	d_amt = min(weight_diffs) * sum(d_vals)
 
-	execute_trade(d_amt, myPortfolio)
+	exchange.trade(d_amt, myPortfolio)
 
 	return rebalance()
 
 
 if __name__ == '__main__':
 
-	init_transactions()
+	transactions.create()
 	# rebalance()

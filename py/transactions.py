@@ -1,9 +1,13 @@
+import datetime
+import pandas as pd
+import numpy as np
+import models
+import exchange
 
-
-def init_transactions():
+def create():
 	''' Create our transactions CSV file if it doesn't yet exist '''
 
-	myPortfolio = Portfolio()
+	myPortfolio = models.Portfolio()
 	try:
 		df = pd.read_csv('../data/portfolio/transactions.csv')
 	except:
@@ -24,18 +28,18 @@ def init_transactions():
 			'realised_pct'
 		])
 		for coin in myPortfolio.coins:
-			add_coin_to_transactions(coin, Portfolio, df)
+			df = add_coin(coin, Portfolio, df)
 
 	return
 
 
-def add_coin_to_transactions(coin, myPortfolio, transactions_df):
+def add_coin(coin, myPortfolio, df):
 	''' Add initial purchase of coin to transactions table '''
 
 	quantity = myPortfolio.quantities[myPortfolio.coins.index(coin)]
-	current_price = coin_price(coin)
+	current_price = exchange.price(coin)
 
-	transactions_df = transactions_df.append({
+	df = df.append({
 		'date': datetime.datetime.now(),
 		'coin': coin,
 		'side': 'buy',
@@ -45,13 +49,13 @@ def add_coin_to_transactions(coin, myPortfolio, transactions_df):
 		'cumulative_units': quantity,
 		'transacted_value': current_price * quantity,
 		'previous_cost': 0,
-		'cumulative_cost': current_price * quantity,
+		'cumulative_cost': current_price * quantity
 	}, ignore_index=True)
 
-	return transactions_df
+	return df
 
 
-def update_transactions(coin, side, quantity, dollar_value, df):
+def update(coin, side, quantity, dollar_value, df):
 	'''
 	Document transaction data to SQL table
 
@@ -82,7 +86,7 @@ def update_transactions(coin, side, quantity, dollar_value, df):
 		realised_pct = gain_loss / cost_of_transaction
 
 	df = df.append({
-		'date': datetime.datetime.now()
+		'date': datetime.datetime.now(),
 		'coin': coin,
 		'side': side,
 		'units': quantity,
