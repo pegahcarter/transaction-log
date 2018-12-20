@@ -75,7 +75,7 @@ def tickers(myPortfolio):
 			return [[coin1, 'BTC'], [coin2, 'BTC']]
 
 
-def trade(d_amt, myPortfolio):
+def trade(d_amt, myPortfolio, df):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
 	binance = connect()

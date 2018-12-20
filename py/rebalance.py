@@ -2,7 +2,7 @@ import models
 import exchange
 import transactions
 
-def rebalance():
+def rebalance(df):
 
 	myPortfolio = models.Portfolio()
 	n = 1/len(myPortfolio.coins)
@@ -14,16 +14,18 @@ def rebalance():
 	weight_diffs = [n - min(d_vals)/sum(d_vals), max(d_vals)/sum(d_vals) - n]
 
 	if min(weight_diffs) < 2 * n * thresh:
+		print('complete')
+		df.to_csv('../data/portfolio/transactions.csv')
 		return
 
 	d_amt = min(weight_diffs) * sum(d_vals)
 
-	exchange.trade(d_amt, myPortfolio)
+	exchange.trade(d_amt, myPortfolio, df)
 
-	return rebalance()
+	return rebalance(df)
 
 
 if __name__ == '__main__':
 
-	transactions.create()
-	# rebalance()
+	df = transactions.create()
+	# rebalance(df)

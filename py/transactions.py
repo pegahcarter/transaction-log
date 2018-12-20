@@ -27,17 +27,26 @@ def create():
 			'gain_loss',
 			'realised_pct'
 		])
-		for coin in myPortfolio.coins:
+
+	coinAdded = None
+	for coin in myPortfolio.coins:
+		if coin not in df['coin']:
 			df = add_coin(coin, Portfolio, df)
+			coinAdded = True
 
-	return
+	if coinAdded:
+		df.to_csv('../data/portfolio/transactions.csv')
+
+	return df
 
 
-def add_coin(coin, myPortfolio, df):
+def add_coin(coin, myPortfolio, df, date=None, current_price=None):
 	''' Add initial purchase of coin to transactions table '''
 
 	quantity = myPortfolio.quantities[myPortfolio.coins.index(coin)]
-	current_price = exchange.price(coin)
+
+    if date is None:
+        current_price = exchange.price(coin)
 
 	df = df.append({
 		'date': datetime.datetime.now(),
@@ -55,7 +64,7 @@ def add_coin(coin, myPortfolio, df):
 	return df
 
 
-def update(coin, side, quantity, dollar_value, df):
+def update(coin, side, quantity, dollar_value, df, date=None, current_price=None):
 	'''
 	Document transaction data to SQL table
 
@@ -67,6 +76,9 @@ def update(coin, side, quantity, dollar_value, df):
 	'''
 
 	previous_units, previous_cost = df[df['coin'] == coin][['cumulative_units', 'cumulative_cost']].iloc[-1, :]
+
+    if date is None:
+        date = datetime.datetime.now()
 
 	if side == 'buy':
 		fees = dollar_value * 0.00075
@@ -86,7 +98,7 @@ def update(coin, side, quantity, dollar_value, df):
 		realised_pct = gain_loss / cost_of_transaction
 
 	df = df.append({
-		'date': datetime.datetime.now(),
+		'date': date,
 		'coin': coin,
 		'side': side,
 		'units': quantity,
