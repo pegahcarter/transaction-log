@@ -23,7 +23,7 @@ def connect():
 def price(coin):
 	''' Return the current dollar price of the coin in question '''
 
-	binance = connect()
+	# binance = connect()
 	btc_price = float(binance.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 	if coin == 'BTC':
 		price = btc_price
@@ -61,32 +61,38 @@ def tickers(myPortfolio):
 	(i.e. XRP/OMG becomes XRP/BTC and OMG/BTC)
 	'''
 
-	binance = connect()
+	# binance = connect()
 	coin1 = myPortfolio.coins[myPortfolio.dollar_values.argmin()]
 	coin2 = myPortfolio.coins[myPortfolio.dollar_values.argmax()]
+
 	try:
 		binance.fetch_ticker(coin1 + '/' + coin2)
-		return [[coin1, coin2]]
+		return [coin1 + '/' + coin2]
 	except:
 		try:
 			binance.fetch_ticker(coin2 + '/' + coin1)
-			return [[coin2, coin1]]
+			return [coin2 + '/' + coin1]
 		except:
-			return [[coin1, 'BTC'], [coin2, 'BTC']]
+			return [coin1 + '/BTC', coin2 + '/BTC']
 
 
 def trade(d_amt, myPortfolio, df):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
-	binance = connect()
+	# binance = connect()
 	trade_tickers = tickers(myPortfolio)
-
-	for ticker in tickers:
+	for ticker in trade_tickers:
 
 		trade_sides = sides(ticker, myPortfolio)
 		trade_quantities = quantities(ticker, d_amt)
 
-		binance.create_order(symbol=ticker, type='market', side=trade_sides[0], amount=trade_quantities[0])
+		print(binance.create_order(symbol=ticker, type='market', side=trade_sides[0], amount=trade_quantities[0]))
 
-		for coin, side, quantity in zip(trade_tickers.split('/'), trade_sides, trade_quantities):
+		for coin, side, quantity in zip(ticker.split('/'), trade_sides, trade_quantities):
 			df = transactions.update(coin, side, quantity, d_amt, df)
+
+	return df
+
+
+
+binance = connect()

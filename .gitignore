@@ -6,11 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
-# API file
-*.txt
-
 # personal transaction data
-data/transactions/*
+data/transactions/transactions.csv
 
 # Distribution / packaging
 .Python
