@@ -1,4 +1,4 @@
-from exchange import *
+import exchange
 
 def find_sides(ticker, myPortfolio):
 	'''
@@ -15,7 +15,7 @@ def find_sides(ticker, myPortfolio):
 		return 'sell', 'buy'
 
 
-def find_quantities(ticker, d_amt):
+def find_units(ticker, d_amt):
 	numerator, denominator = ticker.split('/')
 	return d_amt/coin_price(numerator), d_amt/coin_price(denominator)
 
@@ -30,9 +30,9 @@ def execute_trade(d_amt, myPortfolio):
 		df = refresh_df()
 
 		sides = find_sides(ticker, myPortfolio)
-		quantities = find_quantities(ticker, d_amt)
+		units = find_units(ticker, d_amt)
 
 		exchange.create_order(symbol=ticker, type='market', side=sides[0], amount=quantities[0])
 
-		for coin, side, quantity in zip(tickers.split('/'), sides, quantities):
-			update_transactions(coin, side, quantity, d_amt)
+		for coin, coin_side, coin_units in zip(tickers.split('/'), sides, units):
+			update_transactions(coin, coin_side, coin_units, d_amt)

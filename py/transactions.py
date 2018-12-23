@@ -4,12 +4,14 @@ import numpy as np
 import models
 import exchange
 
+file = '../data/portfolio/transactions.csv'
+
 def create():
     ''' Create our transactions CSV file if it doesn't yet exist '''
 
     myPortfolio = models.Portfolio()
     try:
-        df = pd.read_csv('../data/portfolio/transactions.csv')
+        df = pd.read_csv(file)
     except:
         df = pd.DataFrame(columns=[
             'date',
@@ -28,22 +30,26 @@ def create():
             'realised_pct'
         ])
 
-    coinAdded = None
+
     for coin in myPortfolio.coins:
         if coin not in df['coin']:
             df = add_coin(coin, myPortfolio, df)
-            coinAdded = True
 
-    if coinAdded:
-        df.to_csv('../data/transactions/transactions.csv')
+	if new_transaction(df):
+		df.to_csv(file)
 
     return df
+
+
+def new_transaction(df):
+	if len(df) > len(pd.read_csv(file)):
+		return True
 
 
 def add_coin(coin, myPortfolio, df, date=None):
     ''' Add initial purchase of coin to transactions table '''
 
-    quantity = myPortfolio.quantities[myPortfolio.coins.index(coin)]
+    units = myPortfolio.units[myPortfolio.coins.index(coin)]
 
     if date is None:
         date = datetime.datetime.now()
@@ -53,30 +59,31 @@ def add_coin(coin, myPortfolio, df, date=None):
         'date': date,
         'coin': coin,
         'side': 'buy',
-        'units': quantity,
-        'fees': current_price * quantity * 0.00075,
+        'units': units,
+        'fees': current_price * units * 0.00075,
         'previous_units': 0,
-        'cumulative_units': quantity,
-        'transacted_value': current_price * quantity,
+        'cumulative_units': units,
+        'transacted_value': current_price * units,
         'previous_cost': 0,
-        'cumulative_cost': current_price * quantity
+        'cumulative_cost': current_price * units
     }, ignore_index=True)
 
     return df
 
 
-def update(coin, side, quantity, dollar_value, df, date=None):
+def update(coin, side, units, dollar_value, df, date=None):
     '''
     Document transaction data to SQL table
 
-    coin             - coin we're documenting for the trade
-    side             - side we're executing the trade on (buy or sell)
-    quantity         - quantity of coin to be traded
-    dollar_value     - value of our trade in dollars
-    df                - transactions dataframe
+    coin            - coin we're documenting for the trade
+    side            - side we're executing the trade on (buy or sell)
+    units 			- units of coin to be traded
+    dollar_value    - value of our trade in dollars
+    df              - transactions dataframe
     '''
 
-    previous_units, previous_cost = df[df['coin'] == coin][['cumulative_units', 'cumulative_cost']].iloc[-1, :]
+	prev_units = df[df['coin'] == coin]['cumulative_units'].iloc[-1]
+	prev_cost = df[df['coin'] == coin]['cumulative_cost'].iloc[-1]
 
     if date is None:
         date = datetime.datetime.now()
@@ -84,7 +91,7 @@ def update(coin, side, quantity, dollar_value, df, date=None):
 
     if side == 'buy':
         fees = dollar_value * 0.00075
-        cumulative_units = previous_units + quantity
+        cumulative_units = prev_units + units
         cost_of_transaction = None
         cost_per_unit = None
         cumulative_cost = previous_cost + dollar_value
@@ -92,8 +99,8 @@ def update(coin, side, quantity, dollar_value, df, date=None):
         realised_pct = None
     else:
         fees = None
-        cumulative_units = previous_units - quantity
-        cost_of_transaction = quantity / previous_units * previous_cost
+        cumulative_units = previous_units - units
+        cost_of_transaction = units / previous_units * previous_cost
         cost_per_unit = previous_cost / previous_units
         cumulative_cost = previous_cost - dollar_value
         gain_loss = dollar_value - cost_of_transaction
@@ -103,11 +110,11 @@ def update(coin, side, quantity, dollar_value, df, date=None):
         'date': date,
         'coin': coin,
         'side': side,
-        'units': quantity,
+        'units': units,
         'fees': fees,
         'previous_units': previous_units,
-        'cumulative_units': quantity,
-        'transacted_value': current_price * quantity,
+        'cumulative_units': cumulative_units,
+        'transacted_value': current_price * units,
         'previous_cost': previous_cost,
         'cost_of_transaction':  cost_of_transaction,
         'cost_per_unit': cost_per_unit,

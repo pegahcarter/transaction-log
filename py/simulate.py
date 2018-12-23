@@ -19,7 +19,7 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
     simulations = pd.DataFrame(index=hist_prices['timestamp'])
 
     hist_prices_array = np.array(hist_prices[coins])
-    simulations['hodl'] = list(np.dot(hist_prices_array, myPortfolio.quantities))
+    simulations['hodl'] = list(np.dot(hist_prices_array, myPortfolio.units))
 
 
     df = pd.DataFrame(columns=[
@@ -52,7 +52,7 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
             myPortfolio, df = rebalance(date, myPortfolio, current_prices, df)
 
         current_prices = hist_prices_array[hr]
-        hr_totals.append(np.dot(current_prices, myPortfolio.quantities))
+        hr_totals.append(np.dot(current_prices, myPortfolio.units))
 
     simulations[interval] = hr_totals
 
@@ -62,7 +62,7 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
 
 def rebalance(date, myPortfolio, current_prices, df):
 
-    dollar_values = current_prices * myPortfolio.quantities
+    dollar_values = current_prices * myPortfolio.units
     avg_weight = 1/len(current_prices)
 
     # See how far the lightest and heaviest coin weight deviates from average weight
@@ -91,15 +91,15 @@ def trade(date, dollar_amt, coin_indices, current_prices, myPortfolio, df):
 
         pos = coin_indices[x]
         coin = myPortfolio.coins[pos]
-        quantity = (dollar_amt / current_prices[pos])
+        units = (dollar_amt / current_prices[pos])
 
         # Include a 1% slippage rate and 0.1% trading fee
         if side == 'buy':
-            myPortfolio.quantities[pos] += (quantity * 0.989)
+            myPortfolio.units[pos] += (units * 0.989)
         else:
-            myPortfolio.quantities[pos] -= quantity
+            myPortfolio.units[pos] -= units
 
-        df = transactions.update(coin, side, quantity, dollar_amt, df, date, current_prices[pos])
+        df = transactions.update(coin, side, units, dollar_amt, df, date, current_prices[pos])
 
     return df
 

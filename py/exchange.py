@@ -23,7 +23,7 @@ def connect():
 def price(coin):
 	''' Return the current dollar price of the coin in question '''
 
-	# binance = connect()
+	binance = connect()
 	btc_price = float(binance.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 	if coin == 'BTC':
 		price = btc_price
@@ -34,12 +34,12 @@ def price(coin):
 	return price
 
 
-def sides(ticker, myPortfolio):
+def find_sides(ticker, myPortfolio):
 	'''
 	Return a tuple where the tuple[0] is the side of our trade and tuple[1]
 	is for documenting the other side of the trade
 
-	ticker 		- the coin we are buying and the coin we are selling, combined by '/'
+	ticker - the coin we are buying and the coin we are selling, combined by '/'
 	'''
 
 	numerator = ticker[:ticker.find('/')]
@@ -49,19 +49,19 @@ def sides(ticker, myPortfolio):
 		return 'sell', 'buy'
 
 
-def quantities(ticker, d_amt):
+def find_units(ticker, d_amt):
 	numerator, denominator = ticker.split('/')
 	return d_amt/price(numerator), d_amt/price(denominator)
 
 
-def tickers(myPortfolio):
+def find_tickers(myPortfolio):
 	'''
 	Determine the coin pair needed to execute the trade.
 	If there isn't a pair, convert to BTC first
 	(i.e. XRP/OMG becomes XRP/BTC and OMG/BTC)
 	'''
 
-	# binance = connect()
+	binance = connect()
 	coin1 = myPortfolio.coins[myPortfolio.dollar_values.argmin()]
 	coin2 = myPortfolio.coins[myPortfolio.dollar_values.argmax()]
 
@@ -79,20 +79,16 @@ def tickers(myPortfolio):
 def trade(d_amt, myPortfolio, df):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
-	# binance = connect()
-	trade_tickers = tickers(myPortfolio)
-	for ticker in trade_tickers:
+	binance = connect()
+	tickers = find_tickers(myPortfolio)
+	for ticker in tickers:
 
-		trade_sides = sides(ticker, myPortfolio)
-		trade_quantities = quantities(ticker, d_amt)
+		sides = find_sides(ticker, myPortfolio)
+		units = find_units(ticker, d_amt)
 
-		print(binance.create_order(symbol=ticker, type='market', side=trade_sides[0], amount=trade_quantities[0]))
+		print(binance.create_order(symbol=ticker, type='market', side=sides[0], amount=units[0]))
 
-		for coin, side, quantity in zip(ticker.split('/'), trade_sides, trade_quantities):
-			df = transactions.update(coin, side, quantity, d_amt, df)
+		for coin, coin_side, coin_units in zip(ticker.split('/'), sides, units):
+			df = transactions.update(coin, coin_side, coin_units, d_amt, df)
 
 	return df
-
-
-
-binance = connect()
