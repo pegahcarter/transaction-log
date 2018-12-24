@@ -16,7 +16,7 @@ def rebalance(df):
 	]
 
 	if min(weight_diffs) < 2 * avg_weight * thresh:
-		df.to_csv('../data/transactions/transactions.csv')
+		df.to_csv('../data/transactions/transactions.csv', index=False)
 		return
 
 	d_amt = min(weight_diffs) * sum(d_vals)

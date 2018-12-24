@@ -4,59 +4,6 @@ import numpy as np
 import models
 import exchange
 
-transactions_file = '../data/transactions/transactions.csv'
-sim_transactions_file = '../data/'
-prices_file = '../data/historical/prices.csv'
-
-# ---------------------------------------------------
-# Calculating how much ETH I currently own
-'''
-
-If I pay back CDP's in 100%, how much ETH do I have?
-
-CDP #4762
-    - 60 ETH invested
-    - $4,300 owed
-    - 16 ETH available to withdraw
-    - liquidation price: $107
-
-CDP #4916
-    - 107 ETH invested
-    - $5,800 owed
-    - 48 ETH available to withdraw
-    - liquidation price: $81
-
-
-
-- I withdraw 20 ETH at $150 ($3000 total) from #4916
-- pay down #4916 so there's $2,800 owed
-
-
-''''
-# ---------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Testing with dataframe indexes
-test_df = pd.DataFrame(columns=['a', 'b', 'c'], index=['date'])
-test_df.append([1,2,3], ignore_index=True)
-
-test_df.append({
-    'a': 1,
-    'b': 2,
-    'c': 3
-}, ignore_index=True)
-
-test_df.loc[datetime.datetime.now()] = [1, 2, 3]
-
-test_df.dropna()
-
-test_df.loc[len(test_df)] = [4, 5, 6]
-
-df = pd.read_csv('../data/transactions/transactions.csv')
-
-df.head()
-
-
 '''
 What do I want to do with transactions.csv?
     - First, there's the index issue
@@ -79,26 +26,10 @@ transactions
 
 '''
 
+transactions_file = '../data/transactions/transactions.csv'
+sim_transactions_file = '../data/'
+prices_file = '../data/historical/prices.csv'
 
-
-
-s
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-print('stop')
-# ------------------------------------------------------------------------------
 
 def create():
     ''' Create our transactions CSV file if it doesn't yet exist '''
@@ -130,8 +61,7 @@ def create():
             df = add_coin(coin, exchange.price(coin), myPortfolio, df)
 
     if new_transaction(df):
-
-        df.to_csv(transactions_file)
+        df.to_csv(transactions_file, index=False)
 
     return df
 
@@ -144,7 +74,8 @@ def new_transaction(df):
     # If it has not been created, the if statement above would create an error.
     except:
         return True
-
+    else:
+        return
 
 
 def add_coin(coin, current_price, myPortfolio, df, date=None):
