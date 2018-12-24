@@ -1,6 +1,6 @@
-# import models
-# import exchange
-# import transactions
+import models
+import exchange
+import transactions
 
 def rebalance(df):
 
@@ -15,7 +15,7 @@ def rebalance(df):
 		avg_weight - min(d_vals)/sum(d_vals), max(d_vals)/sum(d_vals) - avg_weight
 	]
 
-	if max(weight_diffs) < 2 * n * thresh:
+	if min(weight_diffs) < 2 * avg_weight * thresh:
 		df.to_csv('../data/transactions/transactions.csv')
 		return
 
@@ -28,12 +28,5 @@ def rebalance(df):
 
 if __name__ == '__main__':
 
-	transactions_file = '../data/transactions/transactions.csv'
-	sim_transactions_file = '../data/'
-	prices_file = '../data/historical/prices.csv'
-
-	import models
-	import exchange
-	import transactions
 	df = transactions.create()
 	rebalance(df)

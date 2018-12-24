@@ -86,9 +86,10 @@ def trade(d_amt, myPortfolio, df):
 		sides = find_sides(ticker, myPortfolio)
 		units = find_units(ticker, d_amt)
 
-		print(binance.create_order(symbol=ticker, type='market', side=sides[0], amount=units[0]))
+		binance.create_order(symbol=ticker, type='market', side=sides[0], amount=units[0])
+		print('trade executed')
 
-		for coin, coin_side, coin_units in zip(ticker.split('/'), sides, units):
-			df = transactions.update(coin, coin_side, coin_units, d_amt, df)
+		for coin, side, coin_units in zip(ticker.split('/'), sides, units):
+			df = transactions.update(coin, side, coin_units, d_amt, df)
 
 	return df

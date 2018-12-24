@@ -34,5 +34,5 @@ def execute_trade(d_amt, myPortfolio):
 
 		exchange.create_order(symbol=ticker, type='market', side=sides[0], amount=quantities[0])
 
-		for coin, coin_side, coin_units in zip(tickers.split('/'), sides, units):
-			update_transactions(coin, coin_side, coin_units, d_amt)
+		for coin, side, coin_units in zip(tickers.split('/'), sides, units):
+			update_transactions(coin, side, coin_units, d_amt)

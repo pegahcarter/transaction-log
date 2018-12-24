@@ -14,15 +14,15 @@ def showTransactions():
 	df = refresh_df()
 	myPortfolio = Portfolio()
 
-	for coin, current_price, quantity in zip(myPortfolio.coins, myPortfolio.current_prices, myPortfolio.quantities):
+	for coin, current_price, coin_units in zip(myPortfolio.coins, myPortfolio.current_prices, myPortfolio.units):
 
 		temp = df.loc[df['coin'] == coin].reset_index(drop=True)
-		cost = temp['cumulative_cost'][len(temp) - 1]
-		cost_per_unit = cost/quantity
-		unrealised_amt = (current_price - cost_per_unit) * quantity
+		cost = temp['cumulative_cost'].iloc[-1]
+		cost_per_unit = cost/coin_units
+		unrealised_amt = (current_price - cost_per_unit) * coin_units
 		realised_amt = sum(temp['gain_loss'].dropna())
 		gain_loss = unrealised_amt + realised_amt
-		market_val = quantity * current_price
+		market_val = coin_units * current_price
 
 		myPortfolio.cost.append(cost)
 		myPortfolio.cost_per_unit.append(cost_per_unit)

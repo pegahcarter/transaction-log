@@ -41,18 +41,23 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
 
     purchase_prices = hist_prices_array[0]
     for x, coin in enumerate(myPortfolio.coins):
-        df = transactions.add_coin(coin, myPortfolio, df, hist_prices['timestamp'][0],purchase_prices[x])
+        df = transactions.add_coin(
+            coin,
+            purchase_prices[x],
+            myPortfolio,
+            df,
+            hist_prices['timestamp'][0]
+        )
 
     hr_totals = [5000]
 
     for hr in range(1, len(hist_prices)):
         if hr % i == 0:
-            current_prices = hist_prices_array[hr]
+            current_prices =
             date = hist_prices['timestamp'][hr]
-            myPortfolio, df = rebalance(date, myPortfolio, current_prices, df)
+            myPortfolio, df = rebalance(date, myPortfolio, hist_prices_array[hr], df)
 
-        current_prices = hist_prices_array[hr]
-        hr_totals.append(np.dot(current_prices, myPortfolio.units))
+        hr_totals.append(np.dot(hist_prices_array[hr], myPortfolio.units))
 
     simulations[interval] = hr_totals
 
