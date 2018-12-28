@@ -2,6 +2,29 @@ import datetime
 import numpy as np
 import pandas as pd
 import exchange
+import transactions
+
+class NewPortfolio(object):
+
+	binance = exchange.connect()
+	balance = binance.fetchBalance()
+
+	def __init__(self):
+
+		coins = [
+			asset['asset']
+			for asset in balance['info']['balances']
+			if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
+		]
+
+		for coin in coins:
+			units = balance[coin]['total']
+			current_price = exchange.price(coin)
+			setattr(self, coin, {
+				'units': units,
+				'current_price': current_price,
+				'dollar_value': units * current_price
+			})
 
 
 class Portfolio(object):

@@ -4,37 +4,27 @@ import numpy as np
 import models
 import exchange
 
-'''
-What do I want to do with transactions.csv?
-    - First, there's the index issue
-        > I want to use date as index
-        > But I can't do that for simulations if there's more than one trade in
-            an hour interval
-        > I want rebalanced transactions and simulated transactions to have the
-            same exact structure
-
-transactions
-    - CSV
-        > column 0 = trade_num
-        > column 1 = date of trade
-
-    - DataFrame
-        > index = trade_num
-        > DF initialization issue
-            - setting an index at first makes an N/A row
-        > Easy way to append?
-
-'''
-
 transactions_file = '../data/transactions/transactions.csv'
 sim_transactions_file = '../data/'
 prices_file = '../data/historical/prices.csv'
 
 
-def create():
+def refresh(portfolio, df):
+
+    #for coin in portfolio.keys():
+    for coin in portfolio.coins:
+        if coin not in df['coin']:
+            add_coin(coin, portfolio, df)
+
+    if new_transaction(df):
+        df.to_csv(transactions_file, index=False)
+
+    return df
+
+
+def initialize(portfolio):
     ''' Create our transactions CSV file if it doesn't yet exist '''
 
-    myPortfolio = models.Portfolio()
     try:
         df = pd.read_csv(transactions_file)
     except:
@@ -55,13 +45,7 @@ def create():
             'realised_pct'
         ])
 
-
-    for coin in myPortfolio.coins:
-        if coin not in df['coin']:
-            df = add_coin(coin, exchange.price(coin), myPortfolio, df)
-
-    if new_transaction(df):
-        df.to_csv(transactions_file, index=False)
+    refresh(portfolio, df)
 
     return df
 
@@ -78,10 +62,10 @@ def new_transaction(df):
         return
 
 
-def add_coin(coin, current_price, myPortfolio, df, date=None):
+def add_coin(coin, portfolio, df, date=None, current_price=None):
     ''' Add initial purchase of coin to transactions table '''
 
-    units = myPortfolio.units[myPortfolio.coins.index(coin)]
+    units = portfolio.units[portfolio.coins.index(coin)]
 
     if date is None:
         date = datetime.datetime.now()

@@ -1,9 +1,9 @@
-from database import init_db
-from models import Transaction, Portfolio
-from functions import coin_price, refresh_df
-from flask import Flask, request, render_template, redirect
 from datetime import datetime
 import pandas as pd
+from flask import Flask, request, render_template, redirect
+import transactions
+import models
+
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -11,8 +11,23 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 @app.route('/')
 def showTransactions():
 
-	df = refresh_df()
-	myPortfolio = Portfolio()
+
+	myPortfolio = models.Portfolio()
+	df = transactions.initialize()
+
+	'''
+	To add:
+	if button on page is clicked:
+		rebalance(myPortfolio, df)
+
+
+	'''
+
+	# Add additional dict/key values for coinDict
+	myPortfolio.add_summary()
+
+
+
 
 	for coin, current_price, coin_units in zip(myPortfolio.coins, myPortfolio.current_prices, myPortfolio.units):
 

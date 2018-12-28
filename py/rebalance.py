@@ -2,31 +2,42 @@ import models
 import exchange
 import transactions
 
-def rebalance(df):
+def rebalance(myPortfolio, df):
 
-	myPortfolio = models.Portfolio()
-	avg_weight = 1.0/len(myPortfolio.coins)
+	# avgWeight = 1.0/len(myPortfolio.keys())
+	avgWeight = 1.0/len(myPortfolio.coins)
+
 	thresh = 0.01
 
-	d_vals = myPortfolio.dollar_values
+	# dollar_values = map(lambda x: x['dollar_value'], myPortfolio)
+	dollar_values = myPortfolio.dollar_values
 	# We'll take the coins with the highest and lowest dollar value to
 	# test our threshold
 	weight_diffs = [
-		avg_weight - min(d_vals)/sum(d_vals), max(d_vals)/sum(d_vals) - avg_weight
+		avgWeight - min(dollar_values)/sum(dollar_values),
+		max(dollar_values)/sum(dollar_values) - avgWeight
 	]
 
-	if min(weight_diffs) < 2 * avg_weight * thresh:
+	if min(weight_diffs) < 2 * avgWeight * thresh:
 		df.to_csv('../data/transactions/transactions.csv', index=False)
-		return
+		return myPortfolio, df
 
-	d_amt = min(weight_diffs) * sum(d_vals)
+	d_amt = min(weight_diffs) * sum(dollar_values)
 
 	df = exchange.trade(d_amt, myPortfolio, df)
 
-	return rebalance(df)
+	return rebalance(myPortfolio, df)
 
 
 if __name__ == '__main__':
 
-	df = transactions.create()
-	rebalance(df)
+	# myPortfolio = models.Portfolio()
+	# df = transactions.initialize(myPortfolio)
+	# transactions.refresh(myPortfolio, df)
+	# rebalance(myPortfolio, df)
+
+
+	myPortfolio = models.Portfolio()
+	df = transactions.initialize(myPortfolio)
+
+	rebalance(myPortfolio, df)
