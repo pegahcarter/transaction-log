@@ -41,7 +41,7 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
 
     purchase_prices = hist_prices_array[0]
     for x, coin in enumerate(myPortfolio.coins):
-        df = transactions.add_coin(
+        transactions.add_coin(
             coin,
             purchase_prices[x],
             myPortfolio,
@@ -53,7 +53,6 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
 
     for hr in range(1, len(hist_prices)):
         if hr % i == 0:
-            current_prices =
             date = hist_prices['timestamp'][hr]
             myPortfolio, df = rebalance(date, myPortfolio, hist_prices_array[hr], df)
 

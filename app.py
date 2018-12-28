@@ -16,7 +16,7 @@ def showTransactions():
 	df = transactions.initialize()
 
 	'''
-	To add:
+	TODO: add
 	if button on page is clicked:
 		rebalance(myPortfolio, df)
 
@@ -24,10 +24,7 @@ def showTransactions():
 	'''
 
 	# Add additional dict/key values for coinDict
-	myPortfolio.add_summary()
-
-
-
+	# myPortfolio.add_summary()
 
 	for coin, current_price, coin_units in zip(myPortfolio.coins, myPortfolio.current_prices, myPortfolio.units):
 

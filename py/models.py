@@ -2,30 +2,6 @@ import datetime
 import numpy as np
 import pandas as pd
 import exchange
-import transactions
-
-class NewPortfolio(object):
-
-	binance = exchange.connect()
-	balance = binance.fetchBalance()
-
-	def __init__(self):
-
-		coins = [
-			asset['asset']
-			for asset in balance['info']['balances']
-			if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
-		]
-
-		for coin in coins:
-			units = balance[coin]['total']
-			current_price = exchange.price(coin)
-			setattr(self, coin, {
-				'units': units,
-				'current_price': current_price,
-				'dollar_value': units * current_price
-			})
-
 
 class Portfolio(object):
 	'''
@@ -55,12 +31,12 @@ class Portfolio(object):
 		self.units = units
 		self.current_prices = current_prices
 		self.dollar_values = units * current_prices
-		# self.cost = []
-		# self.cost_per_unit = []
-		# self.unrealised_amt = []
-		# self.unrealised_pct = []
-		# self.realised_amt = []
-		# self.gain_loss = []
+		self.cost = []
+		self.cost_per_unit = []
+		self.unrealised_amt = []
+		self.unrealised_pct = []
+		self.realised_amt = []
+		self.gain_loss = []
 
 
 # TODO: add column into simulations CSV for coin price at time of trade

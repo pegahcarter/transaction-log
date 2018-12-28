@@ -1,7 +1,6 @@
 import datetime
 import pandas as pd
 import numpy as np
-import models
 import exchange
 
 transactions_file = '../data/transactions/transactions.csv'
@@ -11,7 +10,6 @@ prices_file = '../data/historical/prices.csv'
 
 def refresh(portfolio, df):
 
-    #for coin in portfolio.keys():
     for coin in portfolio.coins:
         if coin not in df['coin']:
             add_coin(coin, portfolio, df)
@@ -87,9 +85,9 @@ def add_coin(coin, portfolio, df, date=None, current_price=None):
     return df
 
 
-def update(coin, side, units, dollar_value, df, date=None):
+def update(coin, side, units, dollar_value, df, date=None, current_price=None):
     '''
-    Document transaction data to SQL table
+    Document transaction data to CSV
 
     coin            - coin we're documenting for the trade
     side            - side we're executing the trade on (buy or sell)
@@ -108,16 +106,16 @@ def update(coin, side, units, dollar_value, df, date=None):
     if side == 'buy':
         fees = dollar_value * 0.00075
         cumulative_units = previous_units + units
-        cost_of_transaction = None
         cost_per_unit = None
+        cost_of_transaction = None
         cumulative_cost = previous_cost + dollar_value
         gain_loss = None
         realised_pct = None
     else:
         fees = None
         cumulative_units = previous_units - units
-        cost_of_transaction = units / previous_units * previous_cost
         cost_per_unit = previous_cost / previous_units
+        cost_of_transaction = units / previous_units * previous_cost
         cumulative_cost = previous_cost - dollar_value
         gain_loss = dollar_value - cost_of_transaction
         realised_pct = gain_loss / cost_of_transaction
