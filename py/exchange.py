@@ -19,13 +19,10 @@ def connect():
 	return exchange
 
 
-binance = connect()
-
-
 def price(coin):
 	''' Return the current dollar price of the coin in question '''
 
-	# binance = connect()
+	binance = connect()
 	btc_price = float(binance.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 	if coin == 'BTC':
 		price = btc_price
@@ -41,16 +38,16 @@ def trade(d_amt, portfolio, df):
 
 	binance = connect()
 	tickers = find_tickers(portfolio)
+	print(tickers)
 
 	for ticker in tickers:
 
 		sides = find_sides(ticker, portfolio)
 		units = find_units(ticker, d_amt)
 
-		# print(ticker)
-		# print(sides[0])
-		# print(units[0])
-		# print(d_amt)
+		print(sides[0])
+		print(units[0])
+		print(d_amt)
 		binance.create_order(symbol=ticker, type='market', side=sides[0], amount=units[0])
 		for coin, side, coin_units in zip(ticker.split('/'), sides, units):
 			transactions.update(coin, side, coin_units, d_amt, df)
@@ -65,7 +62,7 @@ def find_tickers(portfolio):
 	(i.e. XRP/OMG becomes XRP/BTC and OMG/BTC)
 	'''
 
-	# binance = connect()
+	binance = connect()
 	coin1 = portfolio.coins[portfolio.dollar_values.argmin()]
 	coin2 = portfolio.coins[portfolio.dollar_values.argmax()]
 
@@ -77,7 +74,7 @@ def find_tickers(portfolio):
 			binance.fetch_ticker(coin2 + '/' + coin1)
 			return [coin2 + '/' + coin1]
 		except:
-			return [coin1 + '/BTC', coin2 + '/BTC']
+			return [coin2 + '/BTC', coin1 + '/BTC']
 
 
 def find_sides(ticker, myPortfolio):
@@ -85,7 +82,7 @@ def find_sides(ticker, myPortfolio):
 	Return a tuple where the tuple[0] is the side of our trade and tuple[1]
 	is for documenting the other side of the trade
 
-	ticker 		- the coin we are buying and the coin we are selling, combined by '/'
+	ticker - the coin we are buying and the coin we are selling, combined by '/'
 	'''
 
 	numerator = ticker[:ticker.find('/')]

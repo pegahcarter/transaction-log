@@ -2,7 +2,6 @@ import models
 import transactions
 import exchange
 
-
 def rebalance(portfolio, df):
 
 	avgWeight = 1.0/len(portfolio.coins)
@@ -16,18 +15,18 @@ def rebalance(portfolio, df):
 		max(dollar_values)/sum(dollar_values) - avgWeight
 	])
 
-	# if weightToMove < thresh:
-	# 	if transactions.new_transaction(df):
-	# 		df.to_csv('../data/transactions/transactions.csv', index=False)
-	#
-	# 	return portfolio, df
-
 	d_amt = weightToMove * sum(dollar_values)
-	exchange.trade(d_amt, portfolio, df)
-	df.to_csv('../data/transactions/transactions.csv', index=False)
-	print('\n\n')
 
-	# return rebalance(portfolio, df)
+	if d_amt < 30 or weightToMove < thresh:
+		if transactions.new_transaction(df):
+			df.to_csv('../data/transactions/transactions.csv', index=False)
+			print('New transaction added.')
+
+		return portfolio, df
+
+	df = exchange.trade(d_amt, portfolio, df)
+
+	return rebalance(portfolio, df)
 
 
 if __name__ == '__main__':
@@ -36,6 +35,3 @@ if __name__ == '__main__':
 	df = transactions.initialize(myPortfolio)
 
 	rebalance(myPortfolio, df)
-
-	binance = exchange.connect()
-	balance = binance.fetchBalance()

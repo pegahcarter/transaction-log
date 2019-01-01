@@ -4,15 +4,13 @@ import numpy as np
 import exchange
 
 transactions_file = '../data/transactions/transactions.csv'
-sim_transactions_file = '../data/'
 prices_file = '../data/historical/prices.csv'
-
 
 def refresh(portfolio, df):
 
     for coin in portfolio.coins:
         if coin not in df['coin']:
-            add_coin(coin, portfolio, df)
+            df = add_coin(coin, portfolio, df)
 
     if new_transaction(df):
         df.to_csv(transactions_file, index=False)
@@ -43,7 +41,7 @@ def initialize(portfolio):
             'realised_pct'
         ])
 
-    refresh(portfolio, df)
+    df = refresh(portfolio, df)
 
     return df
 
