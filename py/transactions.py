@@ -12,9 +12,6 @@ def refresh(portfolio, df):
         if coin not in df['coin']:
             df = add_coin(coin, portfolio, df)
 
-    if new_transaction(df):
-        df.to_csv(transactions_file, index=False)
-
     return df
 
 
@@ -40,6 +37,8 @@ def initialize(portfolio):
             'gain_loss',
             'realised_pct'
         ])
+
+    df.to_csv(transactions_file, index=False)
 
     df = refresh(portfolio, df)
 

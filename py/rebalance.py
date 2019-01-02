@@ -2,10 +2,11 @@ import models
 import transactions
 import exchange
 
-def rebalance(portfolio, df):
+def rebalance(df):
 
+	portfolio = models.Portfolio()
 	avgWeight = 1.0/len(portfolio.coins)
-	thresh = 0.01
+	thresh = 0.02
 	dollar_values = portfolio.dollar_values
 
 	# We'll take the coins with the highest and lowest dollar value to
@@ -17,21 +18,24 @@ def rebalance(portfolio, df):
 
 	d_amt = weightToMove * sum(dollar_values)
 
-	if d_amt < 30 or weightToMove < thresh:
+	if weightToMove > 0.05:
+		print('Stopping early.')
+		return
+
+	if weightToMove < thresh * avgWeight:
 		if transactions.new_transaction(df):
 			df.to_csv('../data/transactions/transactions.csv', index=False)
-			print('New transaction added.')
+			print('Updated transactions.csv')
 
-		return portfolio, df
+		return
 
 	df = exchange.trade(d_amt, portfolio, df)
 
-	return rebalance(portfolio, df)
+	return rebalance(df)
 
 
 if __name__ == '__main__':
 
-	myPortfolio = models.Portfolio()
-	df = transactions.initialize(myPortfolio)
-
-	rebalance(myPortfolio, df)
+	portfolio = models.Portfolio()
+	df = transactions.initialize(portfolio)
+	rebalance(df)
