@@ -3,6 +3,9 @@ import numpy as np
 import pandas as pd
 import exchange
 
+myPortfolio = Portfolio()
+myPortfolio.coins
+
 
 class Portfolio(object):
 	'''

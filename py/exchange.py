@@ -3,10 +3,12 @@ import datetime
 import ccxt
 import transactions
 
+binance = connect()
+
 def connect():
 	''' Connect to our exchange API and fetch our account balance '''
 
-	with open('../../api.txt', 'r') as f:
+	with open('/home/carter/Documents/Administrative/api.txt', 'r') as f:
 		api = f.readlines()
 		apiKey = api[0][:-1]
 		secret = api[1][:-1]
@@ -22,7 +24,6 @@ def connect():
 def price(coin):
 	''' Return the current dollar price of the coin in question '''
 
-	binance = connect()
 	btc_price = float(binance.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 	if coin == 'BTC':
 		price = btc_price
@@ -33,26 +34,28 @@ def price(coin):
 	return price
 
 
-def trade(d_amt, portfolio, df):
+def trade(d_amt, portfolio):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
 	binance = connect()
+
+	df
 	tickers = find_tickers(portfolio)
-	print(tickers)
+	# print(tickers)
 
 	for ticker in tickers:
 
 		sides = find_sides(ticker, portfolio)
 		units = find_units(ticker, d_amt)
 
-		print(sides[0])
-		print(units[0])
-		print(d_amt)
+		# print(sides[0])
+		# print(units[0])
+		# print(d_amt)
 		binance.create_order(symbol=ticker, type='market', side=sides[0], amount=units[0])
 		for coin, side, coin_units in zip(ticker.split('/'), sides, units):
 			transactions.update(coin, side, coin_units, d_amt, df)
 
-	return df
+	return
 
 
 def find_tickers(portfolio):
