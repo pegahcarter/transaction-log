@@ -1,4 +1,3 @@
-import models
 import transactions
 import exchange
 
@@ -30,39 +29,13 @@ def rebalance(portfolio):
 
 if __name__ == '__main__':
 
-	# Note: Should the CSV creation exist separately?
-	# Do I need to set up the initialize() function into an intitialization
-	# script that's either insie `__init__.py` or inside requirements.txt?
-	# Should this only be set up to run through a web page?
-	# This would be a cool smart contract for a DAO...
 	myPortfolio = transactions.initialize()
 	rebalance(myPortfolio)
 
-
-
-
 '''
-NOTE:
-
-I don't need to load `df` in rebalance.py.  None of the functions nreed it other than
-	in the line
-
-	`
-	if transactions.new_transaction(df):
-		df.to_csv('../data/transactions/transactions.csv', index=False)
-
-	return
-	`
-
-I feel like there's an easy way to validate if there's a new transaction
-	without having to load in `df`...
-
-
+- Should the CSV creation exist separately?
+- Do I need to set up the initialize() function into an intitialization script
+	that's either insie `__init__.py` or inside requirements.txt?
+- Should this only be set up to run through a web page?
+- This would be a cool smart contract for a DAO...
 '''
-
-import pandas as pd
-import os
-os.getcwd()
-
-df = pd.read_csv('/home/carter/Documents/transactions.csv')
-coins = set(df['coin'])

@@ -1,14 +1,13 @@
-import pandas as pd
-import datetime
 import ccxt
 import transactions
+
 
 binance = connect()
 
 def connect():
 	''' Connect to our exchange API and fetch our account balance '''
 
-	with open('/home/carter/Documents/Administrative/api.txt', 'r') as f:
+	with open('../../../administrative/api.txt', 'r') as f:
 		api = f.readlines()
 		apiKey = api[0][:-1]
 		secret = api[1][:-1]
@@ -43,9 +42,9 @@ def trade(d_amt, portfolio):
 		sides = findSides(ticker, portfolio)
 		units = findUnits(ticker, d_amt)
 		binance.create_order(symbol=ticker, type='market', side=sides[0], amount=units[0])
-		transactions.update(coins, sides, units)
+		transactions.update(coins, sides, units, d_amt)
 
-	return
+	return portfolio
 
 
 def findTickers(portfolio):
