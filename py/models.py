@@ -13,8 +13,8 @@ class Portfolio(object):
 
 	coins		    - list of coin names we are invested in
 	units			- list of the units for each coin held
-	current_prices  - list of the most recent dollar price for each coin held
-	dollar_values   - list of the dollar values for each coin held (units * current_prices)
+	currentPrices 	- list of the most recent dollar price for each coin held
+	dollarValues  	- list of the dollar values for each coin held (units * currentPrices)
 
 	'''
 	def __init__(self):
@@ -29,18 +29,18 @@ class Portfolio(object):
 		]
 
 		units = np.array([balance[coin]['total'] for coin in coins])
-		current_prices = [exchange.price(coin) for coin in coins]
+		currentPrices = [exchange.price(coin) for coin in coins]
 
 		self.coins = coins
 		self.units = units
-		self.current_prices = current_prices
-		self.dollar_values = units * current_prices
-		self.cost = []
-		self.cost_per_unit = []
-		self.unrealised_amt = []
-		self.unrealised_pct = []
-		self.realised_amt = []
-		self.gain_loss = []
+		self.currentPrices = currentPrices
+		self.dollarValues = units * currentPrices
+		# self.cost = []
+		# self.cost_per_unit = []
+		# self.unrealised_amt = []
+		# self.unrealised_pct = []
+		# self.realised_amt = []
+		# self.gain_loss = []
 
 
 # TODO: add column into simulations CSV for coin price at time of trade
@@ -48,8 +48,8 @@ class SimPortfolio(object):
 
 	def __init__(self, coins):
 		self.coins = coins
-		hist_prices = pd.read_csv('../data/historical/prices.csv')
-		self.units = [1000 / hist_prices[coin][0] for coin in coins]
+		histPrices = pd.read_csv('../data/historical/prices.csv')
+		self.units = [1000 / histPrices[coin][0] for coin in coins]
 
 
 
@@ -73,11 +73,11 @@ class NewPortfolio(object):
 			# print(coin)
 			# print(balance[coin]['free'])
 			units = float(balance[coin]['free'])
-			current_price = exchange.price(coin)
+			currentPrice = exchange.price(coin)
 			setattr(self, coin, {
 				'units': units,
-				'current_price': current_price,
-				'dollar_value': units * current_price
+				'currentPrice': currentPrice,
+				'dollarValue': units * currentPrice
 			})
 
 

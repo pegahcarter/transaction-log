@@ -21,29 +21,28 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
     hist_prices_array = np.array(hist_prices[coins])
     simulations['hodl'] = list(np.dot(hist_prices_array, myPortfolio.units))
 
-
     df = pd.DataFrame(columns=[
         'date',
         'coin',
         'side',
         'units',
         'fees',
-        'previous_units',
-        'cumulative_units',
-        'transacted_value',
-        'previous_cost',
-        'cost_of_transaction',
-        'cost_per_unit',
-        'cumulative_cost',
-        'gain_loss',
-        'realised_pct'
+        'previousUnits',
+        'cumulativeUnits',
+        'transactedValue',
+        'previousCost',
+        'costOfTransaction',
+        'costPerUnit',
+        'CumulativeCost',
+        'gainLost',
+        'realisedPct'
     ])
 
-    purchase_prices = hist_prices_array[0]
+    purchasePrices = hist_prices_array[0]
     for x, coin in enumerate(myPortfolio.coins):
-        transactions.add_coin(
+        transactions.addCoin(
             coin,
-            purchase_prices[x],
+            purchasePrices[x],
             myPortfolio,
             df,
             hist_prices['timestamp'][0]
@@ -64,46 +63,42 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
     df.to_csv('../data/simulations/transactions.csv')
 
 
-def rebalance(date, myPortfolio, current_prices, df):
+# NOTE: do I need this function here when I have a rebalance function in rebalance.py?
+def rebalance(date, myPortfolio, currentPrices, df):
 
-    dollar_values = current_prices * myPortfolio.units
-    avg_weight = 1/len(current_prices)
-
+    dollarValues = currentPrices * myPortfolio.units
+    avg_weight = 1/len(currentPrices)
     # See how far the lightest and heaviest coin weight deviates from average weight
-    weight_to_move = min([
-        avg_weight - min(dollar_values)/sum(dollar_values),
-        max(dollar_values)/sum(dollar_values) - avg_weight
+    weightToMove = min([
+        avg_weight - min(dollarValues)/sum(dollarValues),
+        max(dollarValues)/sum(dollarValues) - avg_weight
     ])
 
-    if 0.01 > weight_to_move: # note: 0.01 is the same as 0.05 threshold w/ 0.20 weights
+    if 0.01 > weightToMove: # note: 0.01 is the same as 0.05 threshold w/ 0.20 weights
         return myPortfolio, df
 
-    trade_in_dollars = weight_to_move * sum(dollar_values)
-    coin_indices = dollar_values.argmin(), dollar_values.argmax()
+    tradeInDollars = weightToMove * sum(dollarValues)
+    coinIndices = dollarValues.argmin(), dollarValues.argmax()
+    df = trade(date, tradeInDollars, coinIndices, currentPrices, myPortfolio, df)
 
-    df = trade(date, trade_in_dollars, coin_indices, current_prices, myPortfolio, df)
-
-    return rebalance(date, myPortfolio, current_prices, df)
+    return rebalance(date, myPortfolio, currentPrices, df)
 
 
-def trade(date, dollar_amt, coin_indices, current_prices, myPortfolio, df):
+def trade(date, d_amt, coinIndices, currentPrices, myPortfolio, df):
 
     sides = 'buy', 'sell'
-
     # add to transactions
     for x, side in enumerate(sides):
-
-        pos = coin_indices[x]
+        pos = coinIndices[x]
         coin = myPortfolio.coins[pos]
-        units = (dollar_amt / current_prices[pos])
-
+        units = (d_amt / currentPrices[pos])
         # Include a 1% slippage rate and 0.1% trading fee
         if side == 'buy':
             myPortfolio.units[pos] += (units * 0.989)
         else:
             myPortfolio.units[pos] -= units
 
-        df = transactions.update(coin, side, units, dollar_amt, df, date, current_prices[pos])
+        df = transactions.update(coin, side, units, d_amt, df, date, currentPrices[pos])
 
     return df
 

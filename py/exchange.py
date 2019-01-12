@@ -12,12 +12,12 @@ def connect():
 		api = f.readlines()
 		apiKey = api[0][:-1]
 		secret = api[1][:-1]
-
 	exchange = ccxt.binance({
 		'options': {'adjustForTimeDifference': True},
 		'apiKey': apiKey,
 		'secret': secret
 	})
+
 	return exchange
 
 
@@ -37,37 +37,26 @@ def price(coin):
 def trade(d_amt, portfolio):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
-	binance = connect()
-
-	df
-	tickers = find_tickers(portfolio)
-	# print(tickers)
-
+	tickers = findTickers(portfolio)
 	for ticker in tickers:
-
-		sides = find_sides(ticker, portfolio)
-		units = find_units(ticker, d_amt)
-
-		# print(sides[0])
-		# print(units[0])
-		# print(d_amt)
+		coins = ticker.split('/')
+		sides = findSides(ticker, portfolio)
+		units = findUnits(ticker, d_amt)
 		binance.create_order(symbol=ticker, type='market', side=sides[0], amount=units[0])
-		for coin, side, coin_units in zip(ticker.split('/'), sides, units):
-			transactions.update(coin, side, coin_units, d_amt, df)
+		transactions.update(coins, sides, units)
 
 	return
 
 
-def find_tickers(portfolio):
+def findTickers(portfolio):
 	'''
 	Determine the coin pair needed to execute the trade.
 	If there isn't a pair, convert to BTC first
 	(i.e. XRP/OMG becomes XRP/BTC and OMG/BTC)
 	'''
 
-	binance = connect()
-	coin1 = portfolio.coins[portfolio.dollar_values.argmin()]
-	coin2 = portfolio.coins[portfolio.dollar_values.argmax()]
+	coin1 = portfolio.coins[portfolio.dollarValues.argmin()]
+	coin2 = portfolio.coins[portfolio.dollarValues.argmax()]
 
 	try:
 		binance.fetch_ticker(coin1 + '/' + coin2)
@@ -80,7 +69,7 @@ def find_tickers(portfolio):
 			return [coin2 + '/BTC', coin1 + '/BTC']
 
 
-def find_sides(ticker, myPortfolio):
+def findSides(ticker, myPortfolio):
 	'''
 	Return a tuple where the tuple[0] is the side of our trade and tuple[1]
 	is for documenting the other side of the trade
@@ -89,12 +78,14 @@ def find_sides(ticker, myPortfolio):
 	'''
 
 	numerator = ticker[:ticker.find('/')]
-	if myPortfolio.coins.index(numerator) == myPortfolio.dollar_values.argmin():
+	if myPortfolio.coins.index(numerator) == myPortfolio.dollarValues.argmin():
 		return 'buy', 'sell'
 	else:
 		return 'sell', 'buy'
 
 
-def find_units(ticker, d_amt):
+def findUnits(ticker, d_amt):
+
 	numerator, denominator = ticker.split('/')
+
 	return d_amt/price(numerator), d_amt/price(denominator)

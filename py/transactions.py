@@ -2,24 +2,27 @@ import datetime
 import pandas as pd
 import numpy as np
 import exchange
-
-transactions_file = '../data/transactions/transactions.csv'
-prices_file = '../data/historical/prices.csv'
-
-def refresh(portfolio, df):
-
-    for coin in portfolio.coins:
-        if coin not in df['coin']:
-            df = add_coin(coin, portfolio, df)
-
-    return df
+import models
 
 
-def initialize(portfolio):
+TRANSACTIONS_FILE = '../data/transactions/transactions.csv'
+
+
+def refresh(df):
+
+    portfolio = models.portfolio()
+    for coin, coin_units in zip(portfolio.coins, portfolio.units):
+        if coin not in set(df['coin']):
+            addCoin(coin, coin_units, df)
+
+    return portfolio
+
+
+def initialize():
     ''' Create our transactions CSV file if it doesn't yet exist '''
 
     try:
-        df = pd.read_csv(transactions_file)
+        df = pd.read_csv(TRANSACTIONS_FILE)
     except:
         df = pd.DataFrame(columns=[
             'date',
@@ -27,111 +30,117 @@ def initialize(portfolio):
             'side',
             'units',
             'fees',
-            'previous_units',
-            'cumulative_units',
-            'transacted_value',
-            'previous_cost',
-            'cost_of_transaction',
-            'cost_per_unit',
-            'cumulative_cost',
-            'gain_loss',
-            'realised_pct'
+            'previousUnits',
+            'cumulativeUnits',
+            'transactedValue',
+            'previousCost',
+            'costOfTransaction',
+            'costPerUnit',
+            'cumulativeCost',
+            'gainLoss',
+            'realisedPct'
         ])
 
-    df.to_csv(transactions_file, index=False)
+    refresh(df)
 
-    df = refresh(portfolio, df)
-
-    return df
+    return
 
 
-def new_transaction(df):
+def newTransaction(df):
+
     try:
-        if len(df) > len(pd.read_csv(transactions_file)):
+        if len(df) > len(pd.read_csv(TRANSACTIONS_FILE)):
             return True
     # Make an exception in case the transactions file has not been created before.
     # If it has not been created, the if statement above would create an error.
     except:
         return True
     else:
+
         return
 
 
-def add_coin(coin, portfolio, df, date=None, current_price=None):
+def addCoin(coin, portfolio, df, date=None, currentPrice=None):
     ''' Add initial purchase of coin to transactions table '''
-
-    units = portfolio.units[portfolio.coins.index(coin)]
 
     if date is None:
         date = datetime.datetime.now()
-        current_price = exchange.price(coin)
+        currentPrice = exchange.price(coin)
 
     df = df.append({
         'date': date,
         'coin': coin,
         'side': 'buy',
         'units': units,
-        'fees': current_price * units * 0.00075,
-        'previous_units': 0,
-        'cumulative_units': units,
-        'transacted_value': current_price * units,
-        'previous_cost': 0,
-        'cumulative_cost': current_price * units
+        'fees': currentPrice * units * 0.00075,
+        'previousUnits': 0,
+        'cumulativeUnits': units,
+        'transactedValue': currentPrice * units,
+        'previousCost': 0,
+        'cumulativeCost': currentPrice * units,
+        'gainLoss': 0
     }, ignore_index=True)
+    df.to_csv(TRANSACTIONS_FILE)
 
-    return df
+    return
 
 
-def update(coin, side, units, dollar_value, df, date=None, current_price=None):
+def update(coins, sides, units, dollarValue, date=None, currentPrice=None):
     '''
     Document transaction data to CSV
 
     coin            - coin we're documenting for the trade
     side            - side we're executing the trade on (buy or sell)
     units             - units of coin to be traded
-    dollar_value    - value of our trade in dollars
+    dollarValue    - value of our trade in dollars
     df              - transactions dataframe
     '''
 
-    previous_units = df[df['coin'] == coin]['cumulative_units'].iloc[-1]
-    previous_cost = df[df['coin'] == coin]['cumulative_cost'].iloc[-1]
+    df = pd.read_csv(TRANSACTIONS_FILE)
+    for coin, side, coinUnits in zip(coins, sides, units):
 
-    if date is None:
-        date = datetime.datetime.now()
-        current_price = exchange.price(coin)
+        previousUnits = df[df['coin'] == coin]['cumulativeUnits'].iloc[-1]
+        previousCost = df[df['coin'] == coin]['cumulativeCost'].iloc[-1]
 
-    if side == 'buy':
-        fees = dollar_value * 0.00075
-        cumulative_units = previous_units + units
-        cost_per_unit = None
-        cost_of_transaction = None
-        cumulative_cost = previous_cost + dollar_value
-        gain_loss = None
-        realised_pct = None
-    else:
-        fees = None
-        cumulative_units = previous_units - units
-        cost_per_unit = previous_cost / previous_units
-        cost_of_transaction = units / previous_units * previous_cost
-        cumulative_cost = previous_cost - dollar_value
-        gain_loss = dollar_value - cost_of_transaction
-        realised_pct = gain_loss / cost_of_transaction
+        if date is None:
+            date = datetime.datetime.now()
+            currentPrice = exchange.price(coin)
 
-    df = df.append({
-        'date': date,
-        'coin': coin,
-        'side': side,
-        'units': units,
-        'fees': fees,
-        'previous_units': previous_units,
-        'cumulative_units': cumulative_units,
-        'transacted_value': current_price * units,
-        'previous_cost': previous_cost,
-        'cost_of_transaction':  cost_of_transaction,
-        'cost_per_unit': cost_per_unit,
-        'cumulative_cost': cumulative_cost,
-        'gain_loss': gain_loss,
-        'realised_pct': gain_loss
-    }, ignore_index=True)
+        if side == 'buy':
+            fees = dollarValue * 0.00075
+            cumulativeUnits = previousUnits + units
+            costPerUnit = None
+            costOfTransaction = None
+            cumulativeCost = previousCost + dollarValue
+            gainLoss = None
+            realisedPct = None
+        else:
+            fees = None
+            cumulativeUnits = previousUnits - units
+            costPerUnit = previousCost / previousUnits
+            costOfTransaction = units / previousUnits * previousCost
+            cumulativeCost = previousCost - dollarValue
+            gainLoss = dollarValue - costOfTransaction
+            realisedPct = gainLoss / costOfTransaction
 
-    return df
+        df = df.append({
+            'date': date,
+            'coin': coin,
+            'side': side,
+            'units': coinUnits,
+            'fees': fees,
+            'previousUnits': previousUnits,
+            'cumulativeUnits': cumulativeUnits,
+            'transactedValue': currentPrice * units,
+            'previousCost': previousCost,
+            'costOfTransaction':  costOfTransaction,
+            'costPerUnit': costPerUnit,
+            'cumulativeCost': cumulativeCost,
+            'gainLoss': gainLoss,
+            'realisedPct': gainLoss
+        }, ignore_index=True)
+
+    # Save updated dataframe to CSV
+    df.to_csv(TRANSACTIONS_FILE)
+
+    return

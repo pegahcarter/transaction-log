@@ -6,48 +6,37 @@ THRESHOLD = 0.02
 MAX_TRADE_VALUE = 0.05 # ensure that our trade is less than 5% of our total value
 					   # because if it is, there's probably something wrong.
 
-def rebalance():
-
-	portfolio = models.Portfolio()
-	# df = transactions.initialize(portfolio)
+def rebalance(portfolio):
 
 	avgWeight = 1.0/len(portfolio.coins)
-	dollar_values = portfolio.dollar_values
+	dollarValues = portfolio.dollarValues
 
 	# We'll take the coins with the highest and lowest dollar value to
 	# test our threshold adf
 	weightToMove = min([
-		avgWeight - min(dollar_values)/sum(dollar_values),
-		max(dollar_values)/sum(dollar_values) - avgWeight
+		avgWeight - min(dollarValues)/sum(dollarValues),
+		max(dollarValues)/sum(dollarValues) - avgWeight
 	])
-
-	d_amt = weightToMove * sum(dollar_values)
 
 	if weightToMove > MAX_TRADE_VALUE:
 		print('Trade exceeding 5 percent of total portfolio value.  Stopping early.')
 		return
 
 	if weightToMove > THRESHOLD * avgWeight:
-		exchange.trade(d_amt, portfolio)
-
-
-
-		'''
-		if transactions.new_transaction(df):
-			df.to_csv('../data/transactions/transactions.csv', index=False)
-			print('Updated transactions.csv')
-			return
-		'''
-
-	# df = exchange.trade(d_amt, portfolio, df)
-
-
-	return rebalance()
-
+		portfolio = exchange.trade(weightToMove, portfolio)
+		return rebalance(portfolio)
+	else:
+		return
 
 if __name__ == '__main__':
 
-	rebalance()
+	# Note: Should the CSV creation exist separately?
+	# Do I need to set up the initialize() function into an intitialization
+	# script that's either insie `__init__.py` or inside requirements.txt?
+	# Should this only be set up to run through a web page?
+	# This would be a cool smart contract for a DAO...
+	myPortfolio = transactions.initialize()
+	rebalance(myPortfolio)
 
 
 
@@ -70,3 +59,10 @@ I feel like there's an easy way to validate if there's a new transaction
 
 
 '''
+
+import pandas as pd
+import os
+os.getcwd()
+
+df = pd.read_csv('/home/carter/Documents/transactions.csv')
+coins = set(df['coin'])
