@@ -3,9 +3,6 @@ import numpy as np
 import pandas as pd
 import exchange
 
-myPortfolio = Portfolio()
-myPortfolio.coins
-
 
 class Portfolio(object):
 	'''
@@ -22,11 +19,9 @@ class Portfolio(object):
 		binance = exchange.connect()
 		balance = binance.fetchBalance()
 
-		coins = [
-			asset['asset']
-			for asset in balance['info']['balances']
-			if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
-		]
+		coins =	[asset['asset']
+				 for asset in balance['info']['balances']
+				 if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')]
 
 		units = np.array([balance[coin]['total'] for coin in coins])
 		currentPrices = [exchange.price(coin) for coin in coins]
@@ -63,15 +58,11 @@ class NewPortfolio(object):
 
 	def __init__(self):
 		# TODO: convert code before to map() for practice
-		coins = [
-			asset['asset']
-			for asset in balance['info']['balances']
-			if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')
-		]
+		coins = [asset['asset']
+				 for asset in balance['info']['balances']
+				 if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')]
 		# TODO: can the for loop be replicated with map() ?
 		for coin in coins:
-			# print(coin)
-			# print(balance[coin]['free'])
 			units = float(balance[coin]['free'])
 			currentPrice = exchange.price(coin)
 			setattr(self, coin, {

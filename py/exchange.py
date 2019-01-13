@@ -2,8 +2,6 @@ import ccxt
 import transactions
 
 
-binance = connect()
-
 def connect():
 	''' Connect to our exchange API and fetch our account balance '''
 
@@ -11,13 +9,14 @@ def connect():
 		api = f.readlines()
 		apiKey = api[0][:-1]
 		secret = api[1][:-1]
-	exchange = ccxt.binance({
-		'options': {'adjustForTimeDifference': True},
-		'apiKey': apiKey,
-		'secret': secret
-	})
+	exchange = ccxt.binance({'options': {'adjustForTimeDifference': True},
+							 'apiKey': apiKey,
+							 'secret': secret})
 
 	return exchange
+
+
+binance = connect()
 
 
 def price(coin):

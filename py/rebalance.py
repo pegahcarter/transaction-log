@@ -12,10 +12,8 @@ def rebalance(portfolio):
 
 	# We'll take the coins with the highest and lowest dollar value to
 	# test our threshold adf
-	weightToMove = min([
-		avgWeight - min(dollarValues)/sum(dollarValues),
-		max(dollarValues)/sum(dollarValues) - avgWeight
-	])
+	weightToMove = min([avgWeight - min(dollarValues)/sum(dollarValues),
+						max(dollarValues)/sum(dollarValues) - avgWeight])
 
 	if weightToMove > MAX_TRADE_VALUE:
 		print('Trade exceeding 5 percent of total portfolio value.  Stopping early.')
