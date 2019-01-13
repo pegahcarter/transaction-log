@@ -4,14 +4,16 @@ import numpy as np
 import transactions
 import models
 
+i = 24
+INTERVAL = 'daily'
+
+
 def simulate():   # TODO: add coins, interval, and interval string parameter
                   # NOTE: currently using 'i' for interval, and 'interval' for interval string
 
-
     # BTC, ETH, XRP, LTC, XLM coins to start
     coins = ['BTC','ETH','XRP','LTC','XLM']
-    i = 24
-    interval = 'daily'
+
 
     myPortfolio = models.SimPortfolio(coins)
 
@@ -53,10 +55,10 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
 
         hr_totals.append(np.dot(hist_prices_array[hr], myPortfolio.units))
 
-    simulations[interval] = hr_totals
+    simulations[INTERVAL] = hr_totals
 
-    simulations.to_csv('../data/simulations/simulations.csv')
-    df.to_csv('../data/simulations/transactions.csv')
+    simulations.to_csv('../data/simulations/simulations.csv', index=False)
+    df.to_csv('../data/simulations/transactions.csv', index=False)
 
 
 # NOTE: do I need this function here when I have a rebalance function in rebalance.py?

@@ -40,7 +40,15 @@ def trade(d_amt, portfolio):
 		coins = ticker.split('/')
 		sides = findSides(ticker, portfolio)
 		units = findUnits(ticker, d_amt)
-		binance.create_order(symbol=ticker, type='market', side=sides[0], amount=units[0])
+		print("coins", coins)
+		print("sides", sides)
+		print("units", units)
+		print("dollar value", d_amt)
+		print(binance.create_order(symbol=ticker,
+								   type='market',
+								   side=sides[0],
+								   amount=units[0]))
+
 		transactions.update(coins, sides, units, d_amt)
 
 	return portfolio
@@ -67,7 +75,7 @@ def findTickers(portfolio):
 			return [coin2 + '/BTC', coin1 + '/BTC']
 
 
-def findSides(ticker, myPortfolio):
+def findSides(ticker, portfolio):
 	'''
 	Return a tuple where the tuple[0] is the side of our trade and tuple[1]
 	is for documenting the other side of the trade
@@ -76,7 +84,7 @@ def findSides(ticker, myPortfolio):
 	'''
 
 	numerator = ticker[:ticker.find('/')]
-	if myPortfolio.coins.index(numerator) == myPortfolio.dollarValues.argmin():
+	if portfolio.coins.index(numerator) == portfolio.dollarValues.argmin():
 		return 'buy', 'sell'
 	else:
 		return 'sell', 'buy'

@@ -20,7 +20,7 @@ def rebalance(portfolio):
 		return
 
 	if weightToMove > THRESHOLD * avgWeight:
-		portfolio = exchange.trade(weightToMove, portfolio)
+		portfolio = exchange.trade(weightToMove*sum(dollarValues), portfolio)
 		return rebalance(portfolio)
 	else:
 		return
