@@ -7,8 +7,71 @@ import models
 TRANSACTIONS_FILE = '../data/transactions/transactions.csv'
 
 
+def refresh():
+
+    try:
+
+
+    except:
+        initialize()
+        return refresh()
+
+
+
+
+
+
+
 def initialize():
     ''' Create our transactions CSV file if it doesn't yet exist '''
+
+    # Try to read the CSV.  If we can't read it, we need to create the new CSV.
+    # We also need to add the original coin purchases to the CSV, because if we
+    #   save a CSV with titles but no rows, we get a TypeError with the validation
+    #   `if coin in set(df['coin'])`
+
+
+    try:
+        portfolio = models.Portfolio()
+        df = pd.read_csv(TRANSACTIONS_FILE)
+    except:
+        df = pd.DataFrame(columns=['date',
+                                   'coin',
+                                   'side',
+                                   'units',
+                                   'pricePerUnit',
+                                   'fees',
+                                   'previousUnits',
+                                   'cumulativeUnits',
+                                   'transactedValue',
+                                   'previousCost',
+                                   'costOfTransaction',
+                                   'costOfTransactionPerUnit',
+                                   'cumulativeCost',
+                                   'gainLoss',
+                                   'realisedPct'])
+
+        df.to_csv(TRANSACTIONS_FILE)
+
+        [addCoin(coin, coinUnits)
+         for coin, coinUnits in zip(portfolio.coins)]
+
+    return
+
+
+
+
+        # By this time, when we initialize the CSV file will exist and we won't have
+        #   to use the exception.
+
+
+
+
+
+
+
+
+
 
     try:
         portfolio = models.Portfolio()
@@ -34,16 +97,17 @@ def initialize():
         if df is None or coin not in set(df['coin']):
             df = addCoin(coin, coinUnits, df)
 
-    return portfolio
+    return
 
 
-def addCoin(coin, coinUnits, df, date=None, currentPrice=None):
+def addCoin(coin, coinUnits, date=None, currentPrice=None):
     ''' Add initial purchase of coin to transactions table '''
 
     if date is None:
         date = datetime.now()
         currentPrice = exchange.price(coin)
 
+    df = pd.read_csv(TRANSACTIONS_FILE)
     df = df.append({'date': date,
                     'coin': coin,
                     'side': 'buy',
@@ -59,7 +123,7 @@ def addCoin(coin, coinUnits, df, date=None, currentPrice=None):
 
     df.to_csv(TRANSACTIONS_FILE, index=False)
 
-    return df
+    return
 
 
 def update(coins, sides, coinUnits, d_amt, date=None, currentPrice=None):

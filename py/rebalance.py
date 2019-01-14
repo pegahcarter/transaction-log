@@ -2,11 +2,12 @@ import transactions
 import exchange
 
 THRESHOLD = 0.02
-MAX_TRADE_VALUE = 0.05 # ensure that our trade is less than 5% of our total value
+MAX_TRADE_VALUE = 0.10 # ensure that our trade is less than 5% of our total value
 					   # because if it is, there's probably something wrong.
 
-def rebalance(portfolio):
+def rebalance():
 
+	portfolio = models.Portfolio()
 	avgWeight = 1.0/len(portfolio.coins)
 	dollarValues = portfolio.dollarValues
 
@@ -15,20 +16,23 @@ def rebalance(portfolio):
 	weightToMove = min([avgWeight - min(dollarValues)/sum(dollarValues),
 						max(dollarValues)/sum(dollarValues) - avgWeight])
 
-	if weightToMove > MAX_TRADE_VALUE:
-		print('Trade exceeding 5 percent of total portfolio value.  Stopping early.')
+	if weightToMove > avg_weight * MAX_TRADE_VALUE:
+		print('Trade exceeding 10 percent relative to the average weight.  Stopping early.')
 		return
 
-	if weightToMove > THRESHOLD * avgWeight:
-		portfolio = exchange.trade(weightToMove*sum(dollarValues), portfolio)
-		return rebalance(portfolio)
-	else:
+	if weightToMove < avgWeight * THRESHOLD:
+		print('Coin dollar values are within the acceptable threshold.  Rebalance complete!')
 		return
+
+	exchange.trade(weightToMove * sum(dollarValues), portfolio)
+	return rebalance()
+
 
 if __name__ == '__main__':
 
-	myPortfolio = transactions.initialize()
-	rebalance(myPortfolio)
+	transactions.initialize()
+	transactions.refresh()
+	rebalance()
 
 '''
 - Should the CSV creation exist separately?

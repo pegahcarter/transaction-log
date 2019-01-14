@@ -44,10 +44,10 @@ def trade(d_amt, portfolio):
 		print("sides", sides)
 		print("units", units)
 		print("dollar value", d_amt)
-		print(binance.create_order(symbol=ticker,
-								   type='market',
-								   side=sides[0],
-								   amount=units[0]))
+		binance.create_order(symbol=ticker,
+							 type='market',
+							 side=sides[0],
+							 amount=units[0])
 
 		transactions.update(coins, sides, units, d_amt)
 
