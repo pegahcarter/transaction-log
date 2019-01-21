@@ -1,11 +1,11 @@
 import ccxt
 import transactions
-
+import numpy as np
 
 def connect():
 	''' Connect to our exchange API and fetch our account balance '''
 
-	with open('../../../administrative/api.txt', 'r') as f:
+	with open('../../../administrative/ethereum/api.txt', 'r') as f:
 		api = f.readlines()
 		apiKey = api[0][:-1]
 		secret = api[1][:-1]
@@ -24,26 +24,23 @@ def price(coin):
 
 	btc_price = float(binance.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 	if coin == 'BTC':
-		price = btc_price
+		return btc_price
 	else:
 		btc_ratio = float(binance.fetch_ticker(coin + '/BTC')['info']['lastPrice'])
-		price = btc_ratio * btc_price
-
-	return price
+		return btc_ratio * btc_price
 
 
 def trade(d_amt, portfolio):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
 	tickers = findTickers(portfolio)
+	if len(tickers) > 1:
+		print("Conversion to BTC needed.")
+
 	for ticker in tickers:
 		coins = ticker.split('/')
 		sides = findSides(ticker, portfolio)
 		units = findUnits(ticker, d_amt)
-		print("coins", coins)
-		print("sides", sides)
-		print("units", units)
-		print("dollar value", d_amt)
 		binance.create_order(symbol=ticker,
 							 type='market',
 							 side=sides[0],

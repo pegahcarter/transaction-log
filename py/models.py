@@ -21,7 +21,9 @@ class Portfolio(object):
 
 		coins =	[asset['asset']
 				 for asset in balance['info']['balances']
-				 if (float(asset['free']) > 0.01) and (asset['asset'] != 'GAS')]
+				 if (float(asset['free']) > 0.01)
+				 and (asset['asset'] != 'GAS')
+				 and (asset['asset'] != 'BAT')]
 
 		units = np.array([balance[coin]['total'] for coin in coins])
 		currentPrices = [exchange.price(coin) for coin in coins]
@@ -30,20 +32,14 @@ class Portfolio(object):
 		self.units = units
 		self.currentPrices = currentPrices
 		self.dollarValues = units * currentPrices
-		# self.cost = []
-		# self.cost_per_unit = []
-		# self.unrealised_amt = []
-		# self.unrealised_pct = []
-		# self.realised_amt = []
-		# self.gain_loss = []
 
 
 # TODO: add column into simulations CSV for coin price at time of trade
 class SimPortfolio(object):
 
 	def __init__(self, coins):
-		self.coins = coins
 		histPrices = pd.read_csv('../data/historical/prices.csv')
+		self.coins = coins
 		self.units = [1000 / histPrices[coin][0] for coin in coins]
 
 

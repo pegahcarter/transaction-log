@@ -34,8 +34,8 @@ def initialize():
 
     # NOTE: is there an easier way that doesn't require a zip?
     [addCoin(coin, coinUnits)
-     for coin, coinUnits in zip(portfolio.coins, portfolio.units):
-     if df.empty0 or coin not in set(df['coin'])]
+     for coin, coinUnits in zip(portfolio.coins, portfolio.units)
+     if df.empty or coin not in set(df['coin'])]
 
     return
 
@@ -46,6 +46,7 @@ def addCoin(coin, coinUnits, date=None, currentPrice=None):
     if date is None:
         date = datetime.now()
         currentPrice = exchange.price(coin)
+
 
     df = pd.read_csv(TRANSACTIONS_FILE)
     df = df.append({'date': date,
@@ -77,6 +78,10 @@ def update(coins, sides, coinUnits, d_amt, date=None, currentPrice=None):
     df              - transactions dataframe
     '''
 
+    print('Value of trade: ${}'.format(round(d_amt), 2))
+    print(coins)
+    print('\n')
+
     df = pd.read_csv(TRANSACTIONS_FILE)
     for coin, tradeSide, tradeUnits in zip(coins, sides, coinUnits):
 
@@ -104,23 +109,21 @@ def update(coins, sides, coinUnits, d_amt, date=None, currentPrice=None):
             gainLoss = d_amt - costOfTransaction
             realisedPct = gainLoss / costOfTransaction
 
-        df = df.append({
-            'date': date,
-            'coin': coin,
-            'side': tradeSide,
-            'units': tradeUnits,
-            'pricePerUnit': currentPrice,
-            'fees': fees,
-            'previousUnits': previousUnits,
-            'cumulativeUnits': cumulativeUnits,
-            'transactedValue': currentPrice * tradeUnits,
-            'previousCost': previousCost,
-            'costOfTransaction':  costOfTransaction,
-            'costOfTransactionPerUnit': costOfTransactionPerUnit,
-            'cumulativeCost': cumulativeCost,
-            'gainLoss': gainLoss,
-            'realisedPct': realisedPct
-        }, ignore_index=True)
+        df = df.append({'date': date,
+                        'coin': coin,
+                        'side': tradeSide,
+                        'units': tradeUnits,
+                        'pricePerUnit': currentPrice,
+                        'fees': fees,
+                        'previousUnits': previousUnits,
+                        'cumulativeUnits': cumulativeUnits,
+                        'transactedValue': currentPrice * tradeUnits,
+                        'previousCost': previousCost,
+                        'costOfTransaction':  costOfTransaction,
+                        'costOfTransactionPerUnit': costOfTransactionPerUnit,
+                        'cumulativeCost': cumulativeCost,
+                        'gainLoss': gainLoss,
+                        'realisedPct': realisedPct}, ignore_index=True)
 
     # Save updated dataframe to CSV
     df.to_csv(TRANSACTIONS_FILE, index=False)
