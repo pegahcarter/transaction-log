@@ -2,7 +2,6 @@ import transactions
 import exchange
 import models
 
-
 THRESHOLD = 0.02
 MAX_TRADE_VALUE = 0.10 # ensure that our trade is less than 10% of our total value
 					   # because if it is, there's probably something wrong.
