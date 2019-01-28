@@ -8,7 +8,6 @@ __pycache__/
 
 # personal transaction data
 data/transactions/transactions.csv
-data/transactions/2018-binance.xlsx
 
 # Distribution / packaging
 .Python
