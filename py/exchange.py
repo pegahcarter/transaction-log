@@ -34,7 +34,7 @@ def trade(d_amt, portfolio):
 
 	tickers = findTickers(portfolio)
 	print("Dollar Value: ${:,.2f}".format(d_amt))
-	if len(tickers) = 1:
+	if len(tickers) == 1:
 		print('{} => {}'.format(tickers[0][0], tickers[0][1]))
 	else:
 		print("Conversion to BTC needed.")
