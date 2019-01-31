@@ -78,10 +78,6 @@ def update(coins, sides, coinUnits, d_amt, date=None, currentPrice=None):
     df              - transactions dataframe
     '''
 
-    print('Value of trade: ${}'.format(round(d_amt), 2))
-    print(coins)
-    print('\n')
-
     df = pd.read_csv(TRANSACTIONS_FILE)
     for coin, tradeSide, tradeUnits in zip(coins, sides, coinUnits):
 

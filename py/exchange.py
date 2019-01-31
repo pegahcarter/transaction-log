@@ -33,8 +33,14 @@ def trade(d_amt, portfolio):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
 	tickers = findTickers(portfolio)
-	if len(tickers) > 1:
+	print("Dollar Value: ${:,.2f}".format(d_amt))
+	if len(tickers) = 1:
+		print('{} => {}'.format(tickers[0][0], tickers[0][1]))
+	else:
 		print("Conversion to BTC needed.")
+		print('{} => {} => {}'.format(tickers[0][0],
+									  tickers[0][1],
+									  tickers[1][0]))
 
 	for ticker in tickers:
 		coins = ticker.split('/')
