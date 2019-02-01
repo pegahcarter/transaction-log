@@ -4,13 +4,17 @@ import pandas as pd
 import exchange
 import models
 
-['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits', 'cumulativeUnits', 'transactedValue', 'previousCost', 'costOfTransaction', 'costOfTransactionPerUnit', 'cumulativeCost', 'gainLoss', 'realisedPct']
+''' What was my balance on day 0? '''
+
+cols = ['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits',
+        'cumulativeUnits', 'transactedValue', 'previousCost', 'costOfTransaction',
+        'costOfTransactionPerUnit', 'cumulativeCost', 'gainLoss', 'realisedPct']
 
 def initialize():
     ''' Create transactions-old.csv'''
 
 
-    df = pd.DataFrame(columns=)
+    df = pd.DataFrame(columns=cols)
 
 
         df.to_csv(TRANSACTIONS_FILE, index=False)
@@ -28,7 +32,7 @@ def addCoin(coin, coinUnits, date=None, currentPrice=None):
 
     if date is None:
         date = datetime.now()
-        currentPrice = exchange.price(coin)
+        currentPrice = exchange.fetch_price(coin)
 
 
     df = pd.read_csv(TRANSACTIONS_FILE)
@@ -69,7 +73,7 @@ def update(coins, sides, coinUnits, d_amt, date=None, currentPrice=None):
 
         if date is None:
             date = datetime.now()
-            currentPrice = exchange.price(coin)
+            currentPrice = exchange.fetch_price(coin)
 
         if tradeSide == 'buy':
             fees = d_amt * 0.00075

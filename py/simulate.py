@@ -63,17 +63,17 @@ def simulate():   # TODO: add coins, interval, and interval string parameter
 # NOTE: do I need this function here when I have a rebalance function in rebalance.py?
 def rebalance(date, myPortfolio, currentPrices, df):
 
-    dollarValues = currentPrices * myPortfolio.units
+    d_vals = currentPrices * myPortfolio.units
     avg_weight = 1/len(currentPrices)
     # See how far the lightest and heaviest coin weight deviates from average weight
-    weightToMove = min([avg_weight - min(dollarValues)/sum(dollarValues),
-                        max(dollarValues)/sum(dollarValues) - avg_weight])
+    weight = min([avg_weight - min(d_vals)/sum(d_vals),
+                        max(d_vals)/sum(d_vals) - avg_weight])
 
-    if 0.01 > weightToMove: # note: 0.01 is the same as 0.05 threshold w/ 0.20 weights
+    if 0.01 > weight: # note: 0.01 is the same as 0.05 threshold w/ 0.20 weights
         return myPortfolio, df
 
-    tradeInDollars = weightToMove * sum(dollarValues)
-    coinIndices = dollarValues.argmin(), dollarValues.argmax()
+    tradeInDollars = weight * sum(d_vals)
+    coinIndices = d_vals.argmin(), d_vals.argmax()
     df = trade(date, tradeInDollars, coinIndices, currentPrices, myPortfolio, df)
 
     return rebalance(date, myPortfolio, currentPrices, df)

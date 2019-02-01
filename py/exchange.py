@@ -2,18 +2,6 @@ import ccxt
 import transactions
 
 
-market = exchange.load_markets()
-tickers = list(market.keys())
-
-coins = set()
-[[coins.add(coin) for coin in ticker.split('/') if coin != 'BTC'] for ticker in tickers]
-coins = list(coins)
-
-# Since we can't pull BTC/BTC, use BTC/USDT ticker.  Otherwise, use coin/BTC as ticker
-tickers = [coin + '/BTC' for coin in coins]
-
-
-
 def connect():
 	''' Connect to our exchange API and fetch our account balance '''
 
@@ -31,7 +19,7 @@ def connect():
 binance = connect()
 
 
-def price(coin):
+def fetch_price(coin):
 	''' Return the current dollar price of the coin in question '''
 
 	btc_price = float(binance.fetch_ticker('BTC/USDT')['info']['lastPrice'])
@@ -74,8 +62,8 @@ def findTickers(portfolio):
 	(i.e. XRP/OMG becomes XRP/BTC and OMG/BTC)
 	'''
 
-	coin1 = portfolio.coins[portfolio.dollarValues.argmin()]
-	coin2 = portfolio.coins[portfolio.dollarValues.argmax()]
+	coin1 = portfolio.coins[portfolio.d_vals.argmin()]
+	coin2 = portfolio.coins[portfolio.d_vals.argmax()]
 
 	try:
 		binance.fetch_ticker(coin1 + '/' + coin2)
@@ -97,7 +85,7 @@ def findSides(ticker, portfolio):
 	'''
 
 	numerator = ticker[:ticker.find('/')]
-	if portfolio.coins.index(numerator) == portfolio.dollarValues.argmin():
+	if portfolio.coins.index(numerator) == portfolio.d_vals.argmin():
 		return 'buy', 'sell'
 	else:
 		return 'sell', 'buy'

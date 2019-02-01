@@ -5,10 +5,10 @@ import exchange
 class Portfolio(object):
 	'''
 	Represents our account balance on Binance
-	coins		    - list of coin names we are invested in
-	units			- list of the units for each coin held
-	currentPrices 	- list of the most recent dollar price for each coin held
-	dollarValues  	- list of the dollar values for each coin held (units * currentPrices)
+	coins	- list of coin names we are invested in
+	units	- list of the units for each coin held
+	prices 	- list of the most recent dollar price for each coin held
+	d_vals  - list of the dollar values for each coin held (units * prices)
 	'''
 	def __init__(self):
 		binance = exchange.connect()
@@ -20,11 +20,11 @@ class Portfolio(object):
 				 and (asset['asset'] != 'BAT')]
 
 		units = np.array([balance[coin]['total'] for coin in coins])
-		currentPrices = [exchange.price(coin) for coin in coins]
+		prices = [exchange.fetch_price(coin) for coin in coins]
 		self.coins = coins
 		self.units = units
-		self.currentPrices = currentPrices
-		self.dollarValues = units * currentPrices
+		self.prices = prices
+		self.d_vals = units * prices
 # ------------------------------------------------------------------------------
 # TODO: add column into simulations CSV for coin price at time of trade
 class SimPortfolio(object):
@@ -44,7 +44,7 @@ class TestNewPortfolio(object):
 		# TODO: can the for loop be replicated with map() ?
 		for coin in coins:
 			units = float(balance[coin]['free'])
-			currentPrice = exchange.price(coin)
+			currentPrice = exchange.fetch_price(coin)
 			setattr(self, coin, {
 				'units': units,
 				'currentPrice': currentPrice,
