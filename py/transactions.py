@@ -1,34 +1,17 @@
 from datetime import datetime
+from pathlib import Path
 import pandas as pd
 import exchange
 import models
 
-
-TRANSACTIONS_FILE = '../data/transactions/transactions.csv'
-
+['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits', 'cumulativeUnits', 'transactedValue', 'previousCost', 'costOfTransaction', 'costOfTransactionPerUnit', 'cumulativeCost', 'gainLoss', 'realisedPct']
 
 def initialize():
-    ''' Create our transactions CSV file if it doesn't yet exist '''
+    ''' Create transactions-old.csv'''
 
-    try:
-        portfolio = models.Portfolio()
-        df = pd.read_csv(TRANSACTIONS_FILE)
-    except:
-        df = pd.DataFrame(columns=['date',
-                                   'coin',
-                                   'side',
-                                   'units',
-                                   'pricePerUnit',
-                                   'fees',
-                                   'previousUnits',
-                                   'cumulativeUnits',
-                                   'transactedValue',
-                                   'previousCost',
-                                   'costOfTransaction',
-                                   'costOfTransactionPerUnit',
-                                   'cumulativeCost',
-                                   'gainLoss',
-                                   'realisedPct'])
+
+    df = pd.DataFrame(columns=)
+
 
         df.to_csv(TRANSACTIONS_FILE, index=False)
 

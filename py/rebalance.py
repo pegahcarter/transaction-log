@@ -2,6 +2,7 @@ import transactions
 import exchange
 import models
 
+TRANSACTIONS_FILE = '../data/transactions/transactions.csv'
 THRESHOLD = 0.02
 MAX_TRADE_VALUE = 0.10 # ensure that our trade is less than 10% of our total value
 					   # because if it is, there's probably something wrong.
@@ -28,9 +29,3 @@ def rebalance():
 	exchange.trade(d_amt, portfolio)
 
 	return rebalance()
-
-
-if __name__ == '__main__':
-
-	transactions.initialize()
-	rebalance()

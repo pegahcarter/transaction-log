@@ -1,6 +1,19 @@
 import ccxt
 import transactions
 
+
+market = exchange.load_markets()
+tickers = list(market.keys())
+
+coins = set()
+[[coins.add(coin) for coin in ticker.split('/') if coin != 'BTC'] for ticker in tickers]
+coins = list(coins)
+
+# Since we can't pull BTC/BTC, use BTC/USDT ticker.  Otherwise, use coin/BTC as ticker
+tickers = [coin + '/BTC' for coin in coins]
+
+
+
 def connect():
 	''' Connect to our exchange API and fetch our account balance '''
 
@@ -33,14 +46,12 @@ def trade(d_amt, portfolio):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
 	tickers = findTickers(portfolio)
-	print("Dollar Value: ${:,.2f}".format(d_amt))
+	print("Trade value: ${:,.2f}".format(d_amt))
 	if len(tickers) == 1:
 		print('{} => {}'.format(tickers[0][0], tickers[0][1]))
 	else:
 		print("Conversion to BTC needed.")
-		print('{} => {} => {}'.format(tickers[0][0],
-									  tickers[0][1],
-									  tickers[1][0]))
+		print('{} => BTC => {}'.format(tickers[0], tickers[1]))
 
 	for ticker in tickers:
 		coins = ticker.split('/')
@@ -68,13 +79,13 @@ def findTickers(portfolio):
 
 	try:
 		binance.fetch_ticker(coin1 + '/' + coin2)
-		return [coin1 + '/' + coin2]
+		return coin1 + '/' + coin2
 	except:
 		try:
 			binance.fetch_ticker(coin2 + '/' + coin1)
-			return [coin2 + '/' + coin1]
+			return coin2 + '/' + coin1
 		except:
-			return [coin2 + '/BTC', coin1 + '/BTC']
+			return coin2 + '/BTC', coin1 + '/BTC'
 
 
 def findSides(ticker, portfolio):
