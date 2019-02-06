@@ -34,14 +34,12 @@ def trade(d_amt, portfolio):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
 	tickers = findTickers(portfolio)
-	print("Trade value: ${:,.2f}".format(d_amt))
-	if len(tickers) == 1:
-		print('{} => {}'.format(tickers[0][0], tickers[0][1]))
-	else:
+	print('Dollar value: ${}'.format(round(d_amt, 2)))
+	if len(tickers) == 2:
 		print("Conversion to BTC needed.")
-		print('{} => BTC => {}'.format(tickers[0], tickers[1]))
 
 	for ticker in tickers:
+		print(ticker)
 		coins = ticker.split('/')
 		sides = findSides(ticker, portfolio)
 		units = findUnits(ticker, d_amt)
@@ -67,13 +65,13 @@ def findTickers(portfolio):
 
 	try:
 		binance.fetch_ticker(coin1 + '/' + coin2)
-		return coin1 + '/' + coin2
+		return [coin1 + '/' + coin2]
 	except:
 		try:
 			binance.fetch_ticker(coin2 + '/' + coin1)
 			return coin2 + '/' + coin1
 		except:
-			return coin2 + '/BTC', coin1 + '/BTC'
+			return [coin2 + '/BTC', coin1 + '/BTC']
 
 
 def findSides(ticker, portfolio):
@@ -95,4 +93,4 @@ def findUnits(ticker, d_amt):
 
 	numerator, denominator = ticker.split('/')
 
-	return d_amt/price(numerator), d_amt/price(denominator)
+	return d_amt/fetch_price(numerator), d_amt/fetch_price(denominator)

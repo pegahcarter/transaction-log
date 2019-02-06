@@ -5,6 +5,7 @@ import exchange
 import models
 
 ''' What was my balance on day 0? '''
+TRANSACTIONS_FILE = '../data/transactions/transactions.csv'
 
 cols = ['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits',
         'cumulativeUnits', 'transactedValue', 'previousCost', 'costOfTransaction',
@@ -15,9 +16,7 @@ def initialize():
 
 
     df = pd.DataFrame(columns=cols)
-
-
-        df.to_csv(TRANSACTIONS_FILE, index=False)
+    df.to_csv(TRANSACTIONS_FILE, index=False)
 
     # NOTE: is there an easier way that doesn't require a zip?
     [addCoin(coin, coinUnits)
