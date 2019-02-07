@@ -1,32 +1,11 @@
-import ccxt
-import transactions
-
-
-def connect():
-	''' Connect to our exchange API and fetch our account balance '''
-
-	with open('../../../administrative/api.txt', 'r') as f:
-		api = f.readlines()
-		apiKey = api[0][:-1]
-		secret = api[1]
-	exchange = ccxt.binance({'options': {'adjustForTimeDifference': True},
-							 'apiKey': apiKey,
-							 'secret': secret})
-
-	return exchange
-
-
-binance = connect()
-
-
-def fetch_price(coin):
+def fetch_price(coin, api):
 	''' Return the current dollar price of the coin in question '''
 
-	btc_price = float(binance.fetch_ticker('BTC/USDT')['info']['lastPrice'])
+	btc_price = float(api.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 	if coin == 'BTC':
 		return btc_price
 	else:
-		btc_ratio = float(binance.fetch_ticker(coin + '/BTC')['info']['lastPrice'])
+		btc_ratio = float(api.fetch_ticker(coin + '/BTC')['info']['lastPrice'])
 		return btc_ratio * btc_price
 
 
@@ -34,7 +13,7 @@ def trade(d_amt, portfolio):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
 	tickers = findTickers(portfolio)
-	print('Dollar value: ${}'.format(round(d_amt, 2)))
+	print('trade value: ${}'.format(round(d_amt, 2)))
 	if len(tickers) == 2:
 		print("Conversion to BTC needed.")
 
@@ -50,7 +29,7 @@ def trade(d_amt, portfolio):
 
 		transactions.update(coins, sides, units, d_amt)
 
-	return portfolio
+	return
 
 
 def findTickers(portfolio):
@@ -69,7 +48,7 @@ def findTickers(portfolio):
 	except:
 		try:
 			binance.fetch_ticker(coin2 + '/' + coin1)
-			return coin2 + '/' + coin1
+			return [coin2 + '/' + coin1]
 		except:
 			return [coin2 + '/BTC', coin1 + '/BTC']
 

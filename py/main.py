@@ -1,13 +1,11 @@
-from pathlib import Path
-from rebalance import rebalance
+import rebalance
 import models
+import transactions
 
-TRANSACTIONS_FILE = '../data/transactions/transactions.csv'
 
 if __name__ == '__main__':
 
-	if Path(TRANSACTIONS_FILE).exists() is False:
-		transactions.initialize()
+
 
 	portfolio = models.Portfolio()
 	weight = 1.0/len(portfolio.coins)
@@ -18,7 +16,5 @@ if __name__ == '__main__':
 
 	if 20 > trade_weight * sum(portfolio.d_vals):
 		print('No rebalance necessary')
-	elif 100 < trade_weight * sum(portfolio.d_vals):
-		print('Error: trade exceeding $100.')
 	else:
-		rebalance()
+		rebalance.run()

@@ -4,7 +4,6 @@ import pandas as pd
 import exchange
 import models
 
-''' What was my balance on day 0? '''
 TRANSACTIONS_FILE = '../data/transactions/transactions.csv'
 
 cols = ['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits',
@@ -12,13 +11,13 @@ cols = ['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits'
         'costOfTransactionPerUnit', 'cumulativeCost', 'gainLoss', 'realisedPct']
 
 def initialize():
-    ''' Create transactions-old.csv'''
-
+    ''' Create transactions.csv'''
 
     df = pd.DataFrame(columns=cols)
     df.to_csv(TRANSACTIONS_FILE, index=False)
 
     # NOTE: is there an easier way that doesn't require a zip?
+    portfolio = models.Portfolio()
     [addCoin(coin, coinUnits)
      for coin, coinUnits in zip(portfolio.coins, portfolio.units)
      if df.empty or coin not in set(df['coin'])]
@@ -61,7 +60,6 @@ def update(coins, sides, coinUnits, d_amt, date=None, currentPrice=None):
     side            - side we're executing the trade on (buy or sell)
     coinUnits       - units of coin to be traded
     d_amt           - value of our trade in dollars
-    df              - transactions dataframe
     '''
 
     df = pd.read_csv(TRANSACTIONS_FILE)
