@@ -32,7 +32,6 @@ def addCoin(coin, coinUnits, date=None, currentPrice=None):
         date = datetime.now()
         currentPrice = exchange.fetch_price(coin)
 
-
     df = pd.read_csv(TRANSACTIONS_FILE)
     df = df.append({'date': date,
                     'coin': coin,

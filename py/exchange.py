@@ -1,4 +1,8 @@
-def fetch_price(coin, api):
+import ccxt
+
+api = ccxt.binance()
+
+def fetch_price(coin, date=None):
 	''' Return the current dollar price of the coin in question '''
 
 	btc_price = float(api.fetch_ticker('BTC/USDT')['info']['lastPrice'])
@@ -22,7 +26,7 @@ def trade(d_amt, portfolio):
 		coins = ticker.split('/')
 		sides = findSides(ticker, portfolio)
 		units = findUnits(ticker, d_amt)
-		binance.create_order(symbol=ticker,
+		portfolio.binance.create_order(symbol=ticker,
 							 type='market',
 							 side=sides[0],
 							 amount=units[0])
@@ -43,11 +47,11 @@ def findTickers(portfolio):
 	coin2 = portfolio.coins[portfolio.d_vals.argmax()]
 
 	try:
-		binance.fetch_ticker(coin1 + '/' + coin2)
+		portfolio.binance.fetch_ticker(coin1 + '/' + coin2)
 		return [coin1 + '/' + coin2]
 	except:
 		try:
-			binance.fetch_ticker(coin2 + '/' + coin1)
+			portfolio.binance.fetch_ticker(coin2 + '/' + coin1)
 			return [coin2 + '/' + coin1]
 		except:
 			return [coin2 + '/BTC', coin1 + '/BTC']
@@ -71,5 +75,4 @@ def findSides(ticker, portfolio):
 def findUnits(ticker, d_amt):
 
 	numerator, denominator = ticker.split('/')
-
 	return d_amt/fetch_price(numerator), d_amt/fetch_price(denominator)
