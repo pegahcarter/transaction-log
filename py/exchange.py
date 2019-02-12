@@ -1,22 +1,16 @@
-import ccxt
+import constants
 
-api = ccxt.binance()
 
 def fetch_price(coin, date=None):
 	''' Return the current dollar price of the coin in question '''
 
-	if date is not None:
-
-
+	# No date means we're executing the trade in real time
+	btc_price = float(api.fetch_ticker('BTC/USDT')['info']['lastPrice'])
+	if coin == 'BTC':
+		return btc_price
 	else:
-		# No date means we're executing the trade in real time
-		btc_price = float(api.fetch_ticker('BTC/USDT')['info']['lastPrice'])
-		if coin == 'BTC':
-			return btc_price
-		else:
-			btc_ratio = float(api.fetch_ticker(coin + '/BTC')['info']['lastPrice'])
-			return btc_ratio * btc_price
-
+		btc_ratio = float(api.fetch_ticker(coin + '/BTC')['info']['lastPrice'])
+		return btc_ratio * btc_price
 
 
 def trade(d_amt, portfolio):

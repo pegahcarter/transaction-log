@@ -1,16 +1,9 @@
-from datetime import datetime
-from pathlib import Path
-import pandas as pd
+import constants
 import exchange
 import models
 
-TRANSACTIONS_FILE = '../data/transactions/transactions.csv'
 
-cols = ['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits',
-        'cumulativeUnits', 'transactedValue', 'previousCost', 'costOfTransaction',
-        'costOfTransactionPerUnit', 'cumulativeCost', 'gainLoss', 'realisedPct']
-
-def initialize():
+def initialize(coins=None, d_amt=None):
     ''' Create transactions.csv'''
     try:
         df = pd.read_csv(TRANSACTIONS_FILE)
@@ -19,33 +12,42 @@ def initialize():
         df.to_csv(TRANSACTIONS_FILE, index=False)
 
     # NOTE: is there an easier way that doesn't require a zip?
-    portfolio = models.Portfolio()
-    [addCoin(coin, coinUnits)
-     for coin, coinUnits in zip(portfolio.coins, portfolio.units)
-     if df.empty or coin not in set(df['coin'])]
+    if coins:
+        portfolio = models.Portfolio(coins, d_amt)
+        [addCoin(coin, coinUnits, simulation=portfolio)
+         for coin, coinUnits in zip(portfolio.coins, portfolio.units)]
+     else:
+        portfolio = Portfolio()
+        [addCoin(coin, coinUnits)
+         for coin, coinUnits in zip(portfolio.coins, portfolio.units)
+         if df.empty or coin not in set(df['coin'])]
 
     return
 
 
-def addCoin(coin, coinUnits, date=None, currentPrice=None):
+
+def addCoin(coin, coinUnits, simulation=None):
     ''' Add initial purchase of coin to transactions table '''
 
-    if date is None:
+    if simulation:
+        date = simulation.start_date
+        price = simulation.hist_prices[coins.index(coin)][0]
+    else:
         date = datetime.now()
-        currentPrice = exchange.fetch_price(coin)
+        price = exchange.fetch_price(coin)
 
     df = pd.read_csv(TRANSACTIONS_FILE)
     df = df.append({'date': date,
                     'coin': coin,
                     'side': 'buy',
                     'units': coinUnits,
-                    'pricePerUnit': currentPrice,
-                    'fees': currentPrice * coinUnits * 0.00075,
+                    'pricePerUnit': price,
+                    'fees': price * coinUnits * 0.00075,
                     'previousUnits': 0,
                     'cumulativeUnits': coinUnits,
-                    'transactedValue': currentPrice * coinUnits,
+                    'transactedValue': price * coinUnits,
                     'previousCost': 0,
-                    'cumulativeCost': currentPrice * coinUnits,
+                    'cumulativeCost': price * coinUnits,
                     'gainLoss': 0}, ignore_index=True)
 
     df.to_csv(TRANSACTIONS_FILE, index=False)

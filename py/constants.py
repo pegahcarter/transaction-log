@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import ccxt
 
-
 INTERVAL = 'daily'
 HRS_BETWEEN_REBALANCING = 24
 PORTFOLIO_START_VALUE = 5000
@@ -16,7 +15,6 @@ TRANSACTIONS_FILE = '../data/transactions/transactions.csv'
 COLUMNS = ['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits',
            'cumulativeUnits', 'transactedValue', 'previousCost', 'costOfTransaction',
            'costOfTransactionPerUnit', 'cumulativeCost', 'gainLoss', 'realisedPct']
-
 
 api = ccxt.binance()
 login = pd.read_csv('../api.csv')
