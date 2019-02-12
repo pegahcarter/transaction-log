@@ -5,24 +5,26 @@ api = ccxt.binance()
 def fetch_price(coin, date=None):
 	''' Return the current dollar price of the coin in question '''
 
-	btc_price = float(api.fetch_ticker('BTC/USDT')['info']['lastPrice'])
-	if coin == 'BTC':
-		return btc_price
+	if date is not None:
+
+
 	else:
-		btc_ratio = float(api.fetch_ticker(coin + '/BTC')['info']['lastPrice'])
-		return btc_ratio * btc_price
+		# No date means we're executing the trade in real time
+		btc_price = float(api.fetch_ticker('BTC/USDT')['info']['lastPrice'])
+		if coin == 'BTC':
+			return btc_price
+		else:
+			btc_ratio = float(api.fetch_ticker(coin + '/BTC')['info']['lastPrice'])
+			return btc_ratio * btc_price
+
 
 
 def trade(d_amt, portfolio):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
 	tickers = findTickers(portfolio)
-	print('trade value: ${}'.format(round(d_amt, 2)))
-	if len(tickers) == 2:
-		print("Conversion to BTC needed.")
 
 	for ticker in tickers:
-		print(ticker)
 		coins = ticker.split('/')
 		sides = findSides(ticker, portfolio)
 		units = findUnits(ticker, d_amt)

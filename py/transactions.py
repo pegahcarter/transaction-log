@@ -12,9 +12,11 @@ cols = ['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits'
 
 def initialize():
     ''' Create transactions.csv'''
-
-    df = pd.DataFrame(columns=cols)
-    df.to_csv(TRANSACTIONS_FILE, index=False)
+    try:
+        df = pd.read_csv(TRANSACTIONS_FILE)
+    except:
+        df = pd.DataFrame(columns=cols)
+        df.to_csv(TRANSACTIONS_FILE, index=False)
 
     # NOTE: is there an easier way that doesn't require a zip?
     portfolio = models.Portfolio()
