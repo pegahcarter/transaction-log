@@ -1,24 +1,29 @@
 # File used to create simulate code
-import constants
+from constants import *
 from models import Portfolio
 import transactions
 import rebalance
 
-s = pd.DataFrame(index=p['timestamp']) # simulations dataframe with hourly results
+transactions.initialize(coins, PORTFOLIO_START_VALUE)
+
+simulations = pd.DataFrame(columns=['timestamp', 'hodl', 'rebalanced'])
 
 
-s['hodl'] = list(np.dot(p[coins], 100))
+test = pd.DataFrame(columns=['a', 'b', 'c'])
+
+test = test.append({'a': 1, 'c': 3}, ignore_index=True)
 
 
-transactions.initialize(coins, d_amt)
 
 for index, row in prices.iterrows():
+    if index % i == 0:
+        rebalance.run(coins, simulated=True)
 
-    if index // i == 0:
-        rebalance.run(coins)
+    # Append hodl total value
+
+    # Append rebalanced total value
 
 
-rebalance.run(coins)
 
 
 

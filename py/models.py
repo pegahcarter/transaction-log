@@ -1,4 +1,4 @@
-import constants
+from constants import *
 import exchange
 
 
@@ -10,13 +10,12 @@ class Portfolio(object):
 	prices 	- list of the most recent dollar price for each coin held
 	d_vals  - list of the dollar values for each coin held (units * prices)
 	'''
-	
-	def __init__(self, coins=None, d_amt=None):
+
+	def __init__(self, coins=None):
 		if coins:
-			self.hist_prices = np.array(hist_prices[coins])
-			self.start_date = hist_prices['timestamp'][0]
-			prices = [hist_prices[coin][0] for coin in coins]
-			units =  np.divide(prices, d_amt/len(coins))
+			prices = hist_prices[coins].iloc[0].tolist()
+			amt_each = PORTFOLIO_START_VALUE / len(coins)
+			units =  np.divide(amt_each, prices)
 		else:
 			binance = ccxt.binance({'options': {'adjustForTimeDifference': True},
 			                        'apiKey': login['apiKey'],

@@ -1,40 +1,33 @@
-import constants
+from constants import *
 import exchange
-import models
+from models import Portfolio
 
 
-def initialize(coins=None, d_amt=None):
+def initialize(coins=None, PORTFOLIO_START_VALUE=None):
     ''' Create transactions.csv'''
     try:
         df = pd.read_csv(TRANSACTIONS_FILE)
-    except:
-        df = pd.DataFrame(columns=cols)
+    except FileNotFoundError:
+        df = pd.DataFrame(columns=COLUMNS)
         df.to_csv(TRANSACTIONS_FILE, index=False)
 
-    # NOTE: is there an easier way that doesn't require a zip?
-    if coins:
-        portfolio = models.Portfolio(coins, d_amt)
-        [addCoin(coin, coinUnits, simulation=portfolio)
-         for coin, coinUnits in zip(portfolio.coins, portfolio.units)]
-     else:
-        portfolio = Portfolio()
-        [addCoin(coin, coinUnits)
-         for coin, coinUnits in zip(portfolio.coins, portfolio.units)
-         if df.empty or coin not in set(df['coin'])]
+    portfolio = Portfolio(coins)
+    for coin, coinUnits in zip(portfolio.coins, portfolio.units):
+        if df.empty or coin not in set(df['coin']):
+            addCoin(coin, coinUnits, PORTFOLIO_START_VALUE)
 
     return
 
 
-
-def addCoin(coin, coinUnits, simulation=None):
+def addCoin(coin, coinUnits, PORTFOLIO_START_VALUE=None):
     ''' Add initial purchase of coin to transactions table '''
 
-    if simulation:
-        date = simulation.start_date
-        price = simulation.hist_prices[coins.index(coin)][0]
-    else:
-        date = datetime.now()
+    if PORTFOLIO_START_VALUE is None:
+        date = time.time()
         price = exchange.fetch_price(coin)
+    else:
+        date = START_DATE
+        price = hist_prices[coin][0]
 
     df = pd.read_csv(TRANSACTIONS_FILE)
     df = df.append({'date': date,
@@ -65,15 +58,15 @@ def update(coins, sides, coinUnits, d_amt, date=None, currentPrice=None):
     d_amt           - value of our trade in dollars
     '''
 
-    df = pd.read_csv(TRANSACTIONS_FILE)
     for coin, tradeSide, tradeUnits in zip(coins, sides, coinUnits):
 
+        if date is None:
+            date = time.time()
+            currentPrice = exchange.fetch_price(coin)
+
+        df = pd.read_csv(TRANSACTIONS_FILE)
         previousUnits = df[df['coin'] == coin]['cumulativeUnits'].iloc[-1]
         previousCost = df[df['coin'] == coin]['cumulativeCost'].iloc[-1]
-
-        if date is None:
-            date = datetime.now()
-            currentPrice = exchange.fetch_price(coin)
 
         if tradeSide == 'buy':
             fees = d_amt * 0.00075
