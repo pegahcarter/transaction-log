@@ -1,9 +1,18 @@
-from constants import *
 import exchange
+import time
+import pandas as pd
 from models import Portfolio
 
+hist_prices = pd.read_csv('../data/historical/prices.csv')
+START_DATE = int(hist_prices['timestamp'][0])
 
-def initialize(coins=None, PORTFOLIO_START_VALUE=None):
+
+COLUMNS = ['date', 'coin', 'side', 'units', 'pricePerUnit', 'fees', 'previousUnits',
+           'cumulativeUnits', 'transactedValue', 'previousCost', 'costOfTransaction',
+           'costOfTransactionPerUnit', 'cumulativeCost', 'gainLoss', 'realisedPct']
+
+
+def initialize(TRANSACTIONS_FILE, PORTFOLIO_START_VALUE=None, coins=None):
     ''' Create transactions.csv'''
     try:
         df = pd.read_csv(TRANSACTIONS_FILE)
@@ -11,15 +20,15 @@ def initialize(coins=None, PORTFOLIO_START_VALUE=None):
         df = pd.DataFrame(columns=COLUMNS)
         df.to_csv(TRANSACTIONS_FILE, index=False)
 
-    portfolio = Portfolio(coins)
+    portfolio = Portfolio(coins, PORTFOLIO_START_VALUE)
     for coin, coinUnits in zip(portfolio.coins, portfolio.units):
         if df.empty or coin not in set(df['coin']):
-            addCoin(coin, coinUnits, PORTFOLIO_START_VALUE)
+            addCoin(coin, coinUnits, TRANSACTIONS_FILE, PORTFOLIO_START_VALUE)
 
     return
 
 
-def addCoin(coin, coinUnits, PORTFOLIO_START_VALUE=None):
+def addCoin(coin, coinUnits, TRANSACTIONS_FILE, PORTFOLIO_START_VALUE=None):
     ''' Add initial purchase of coin to transactions table '''
 
     if PORTFOLIO_START_VALUE is None:

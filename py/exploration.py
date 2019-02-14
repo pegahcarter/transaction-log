@@ -1,23 +1,27 @@
 # File used to create simulate code
-from constants import *
 from models import Portfolio
+import pandas as pd
 import transactions
 import rebalance
 
-transactions.initialize(coins, PORTFOLIO_START_VALUE)
+FREQUENCY = 'daily'
+INTERVAL = 24
+coins = ['BTC','ETH','XRP','LTC','XLM'] # TODO: dynamic coins
+PORTFOLIO_START_VALUE = 5000
+hr_totals = [PORTFOLIO_START_VALUE]
+TRANSACTIONS_FILE = '../data/simulations/transactions.csv'
+hist_prices = pd.read_csv('../data/historical/prices.csv')[['timestamp'] + coins]
+
+
+transactions.initialize(TRANSACTIONS_FILE, PORTFOLIO_START_VALUE, coins)
 
 simulations = pd.DataFrame(columns=['timestamp', 'hodl', 'rebalanced'])
 
 
-test = pd.DataFrame(columns=['a', 'b', 'c'])
-
-test = test.append({'a': 1, 'c': 3}, ignore_index=True)
-
-
 
 for index, row in prices.iterrows():
-    if index % i == 0:
-        rebalance.run(coins, simulated=True)
+    if index % INTERVAL == 0:
+        portfolio = rebalance.run(coins)
 
     # Append hodl total value
 

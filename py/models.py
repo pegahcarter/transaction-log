@@ -1,5 +1,8 @@
-from constants import *
+import ccxt
+import pandas as pd
+import numpy as np
 import exchange
+
 
 
 class Portfolio(object):
@@ -11,8 +14,9 @@ class Portfolio(object):
 	d_vals  - list of the dollar values for each coin held (units * prices)
 	'''
 
-	def __init__(self, coins=None):
-		if coins:
+	def __init__(self, coins=None, PORTFOLIO_START_VALUE=None):
+		if coins is not None:
+			hist_prices = pd.read_csv('../data/historical/prices.csv')[['timestamp'] + coins]
 			prices = hist_prices[coins].iloc[0].tolist()
 			amt_each = PORTFOLIO_START_VALUE / len(coins)
 			units =  np.divide(amt_each, prices)
