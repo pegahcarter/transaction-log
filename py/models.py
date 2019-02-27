@@ -4,7 +4,6 @@ import numpy as np
 import exchange
 
 
-
 class Portfolio(object):
 	'''
 	Represents our account balance on Binance
@@ -21,9 +20,10 @@ class Portfolio(object):
 			amt_each = PORTFOLIO_START_VALUE / len(coins)
 			units =  np.divide(amt_each, prices)
 		else:
+			api = pd.read_csv('../api.csv')
 			binance = ccxt.binance({'options': {'adjustForTimeDifference': True},
-			                        'apiKey': login['apiKey'],
-			                        'secret': login['secret']})
+			                        'apiKey': api['apiKey'][0],
+			                        'secret': api['secret'][0]})
 
 			self.binance = binance
 			balance = binance.fetchBalance()

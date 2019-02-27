@@ -1,19 +1,16 @@
 import ccxt
 import pandas as pd
+import transactions
 
 api = ccxt.binance()
 all_tickers = list(api.fetch_tickers().keys())
-# login = pd.read_csv('../api.csv')
-# binance = ccxt.binance({'options': {'adjustForTimeDifference': True},
-#                         'apiKey': login['apiKey'],
-#                         'secret': login['secret']})
 
 
 def fetch_price(coin, date=None):
 	''' Return the current dollar price of the coin in question '''
 
 	if date:
-		pass
+		pass # TODO: add @param for simulation
 	else:
 		# No date means we're executing the trade in real time
 		btc_price = float(api.fetch_ticker('BTC/USDT')['info']['lastPrice'])
@@ -27,23 +24,23 @@ def fetch_price(coin, date=None):
 def trade(d_amt, portfolio, date=None):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
-	tickers = findTickers(portfolio)
+	tickers = find_tickers(portfolio)
+	print(tickers)
 
 	for ticker in tickers:
-		coins = ticker.split('/')
-		sides = findSides(ticker, portfolio)
-		units = findUnits(ticker, d_amt)
-		binance.create_order(symbol=ticker,
-							 type='market',
-							 side=sides[0],
-							 amount=units[0])
+		trade_coins = ticker.split('/')
+		trade_sides = findSides(ticker, portfolio)
+		trade_units = findUnits(ticker, d_amt)
+		if date is None:
+			portfolio.binance.create_order(ticker, 'market', trade_sides[0], trade_units[0])
 
-		transactions.update(coins, sides, units, d_amt)
+		transactions.update(trade_coins, trade_sides, trade_units, d_amt)
+
 
 	return
 
 
-def findTickers(portfolio):
+def find_tickers(portfolio):
 	'''
 	Determine the coin pair needed to execute the trade.
 	If there isn't a pair, convert to BTC first
@@ -52,9 +49,9 @@ def findTickers(portfolio):
 
 	coin1 = portfolio.coins[portfolio.d_vals.argmin()]
 	coin2 = portfolio.coins[portfolio.d_vals.argmax()]
-	if coin1 + '/' + coin2 in tickers:
+	if coin1 + '/' + coin2 in all_tickers:
 		return [coin1 + '/' + coin2]
-	elif coin2 + '/' + coin1 in tickers:
+	elif coin2 + '/' + coin1 in all_tickers:
 		return [coin2 + '/' + coin1]
 	else:
 		return [coin2 + '/BTC', coin1 + '/BTC']
@@ -73,7 +70,7 @@ def findSides(ticker, portfolio):
 		return 'sell', 'buy'
 
 
-def findUnits(ticker, d_amt, date=None): # TODO: add @param
+def findUnits(ticker, d_amt, date=None): # TODO: add @param for simulation
 
 	numerator, denominator = ticker.split('/')
-	return d_amt/fetch_price(numerator, date), d_amt/fetch_price(denominator, date)
+	return [d_amt/fetch_price(numerator, date), d_amt/fetch_price(denominator, date)]
