@@ -26,10 +26,31 @@ def fetch_price(coin, date=None):
 def trade(d_amt, portfolio, date=None):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
-	tickers = find_tickers(portfolio)
-	print(tickers)
+	# `l` == "lowest market cap", `h` == "highest_market cap"
+	l_coin = portfolio.coins[portfolio.d_vals.argmin()]
+	h_coin= portfolio.coins[portfolio.d_vals.argmax()]
+	print('Value of trade: ${}'.format(round(d_amt,2)))
+	print('Sell: {}'.format(h_coin))
+	print('Buy: {}'.format(l_coin))
 
-	for ticker in tickers:
+	# See if ticker exists on exchange - TODO: obviously the ticker will already exist
+	# 	because the pair will already exist on the DEX
+	# `t` == `ticker`
+	t1 = l_coin + '/' + h_coin
+	t2 = h_coin + '/' + l_coin
+
+	#	NOTE: what do we do if the pair __does not__ exist on the DEX?
+	if t1 and t2 not in all_tickers:
+		tickers_to_trade = [[h_coin + '/BTC'], [l_coin + '/BTC']]
+		print('Coin ticker does not exist on exchange.  BTC used as base pair for both coins.')
+	else:
+		convert_to_btc = False
+		if t1 in all_tickers:
+			tickers_to_trade = [t1]
+		else:
+			tickers_to_trade = [t2]
+
+	for ticker in tickers_to_trade:
 		trade_coins = ticker.split('/')
 		trade_sides = findSides(ticker, portfolio)
 		trade_units = findUnits(ticker, d_amt)
@@ -38,25 +59,7 @@ def trade(d_amt, portfolio, date=None):
 
 		transactions.update(trade_coins, trade_sides, trade_units, d_amt)
 
-
 	return
-
-
-def find_tickers(portfolio):
-	'''
-	Determine the coin pair needed to execute the trade.
-	If there isn't a pair, convert to BTC first
-	(i.e. XRP/OMG becomes XRP/BTC and OMG/BTC)
-	'''
-
-	coin1 = portfolio.coins[portfolio.d_vals.argmin()]
-	coin2 = portfolio.coins[portfolio.d_vals.argmax()]
-	if coin1 + '/' + coin2 in all_tickers:
-		return [coin1 + '/' + coin2]
-	elif coin2 + '/' + coin1 in all_tickers:
-		return [coin2 + '/' + coin1]
-	else:
-		return [coin2 + '/BTC', coin1 + '/BTC']
 
 
 def findSides(ticker, portfolio):

@@ -1,6 +1,7 @@
 import models
 import transactions
 import exchange
+from crontab import CronTab
 
 MAX_TRADE_VALUE = 200 # ensure that our trade is worth less than our upper limit
 
@@ -15,11 +16,9 @@ def run(coins=None):
 						max(portfolio.d_vals)/sum(portfolio.d_vals) - avg_weight])
 
 	d_amt = trade_weight * sum(portfolio.d_vals)
+	
 	if d_amt < 20:
 		print('Trade value is less than $20.  Rebalance complete.')
-		return
-	elif d_amt > MAX_TRADE_VALUE:
-		print('Attempted to trade at a value above {}.  Stopping early.'.format(MAX_TRADE_VALUE))
 		return
 
 	exchange.trade(d_amt, portfolio) # TODO: add @param to recognize simulation for trade
