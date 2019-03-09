@@ -16,8 +16,6 @@ def fetch_price(coin, date=None):
 		btc_price = float(api.fetch_ticker('BTC/USDT')['info']['lastPrice'])
 		if coin == 'BTC':
 			return btc_price
-		elif coin == 'USDT':
-			return 1.0
 		else:
 			btc_ratio = float(api.fetch_ticker(coin + '/BTC')['info']['lastPrice'])
 			return btc_ratio * btc_price
