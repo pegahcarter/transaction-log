@@ -39,7 +39,7 @@ def trade(d_amt, portfolio, date=None):
 	t1 = l_coin + '/' + h_coin
 	t2 = h_coin + '/' + l_coin
 
-	#	NOTE: what do we do if the pair __does not__ exist on the DEX?
+	#	NOTE: what do we do if the pair _does not_ exist on the DEX?
 	if t1 and t2 not in all_tickers:
 		tickers_to_trade = [[h_coin + '/BTC'], [l_coin + '/BTC']]
 		print('Coin ticker does not exist on exchange.  BTC used as base pair for both coins.')
