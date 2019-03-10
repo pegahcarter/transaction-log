@@ -24,12 +24,12 @@ def fetch_price(coin, date=None):
 def trade(d_amt, portfolio, date=None):
 	''' Execute trade on exchange to rebalance, and document said trade to transactions	'''
 
-	# `l` == "lowest market cap", `h` == "highest_market cap"
+	# `l` == "lowest weight in portfolio", `h` == "highest weight in portfolio"
 	l_coin = portfolio.coins[portfolio.d_vals.argmin()]
 	h_coin= portfolio.coins[portfolio.d_vals.argmax()]
 	print('Value of trade: ${}'.format(round(d_amt,2)))
 	print('Sell: {}'.format(h_coin))
-	print('Buy: {}'.format(l_coin))
+	print('Buy: {}\n'.format(l_coin))
 
 	# See if ticker exists on exchange - TODO: obviously the ticker will already exist
 	# 	because the pair will already exist on the DEX

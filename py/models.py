@@ -16,7 +16,6 @@ class Portfolio(object):
 
 	def __init__(self, coins=None, PORTFOLIO_START_VALUE=None):
 		if PORTFOLIO_START_VALUE is not None:
-			coins_in_portfolio = coins
 			hist_prices = pd.read_csv()[['timestamp'] + coins_in_portfolio]
 			amt_each = PORTFOLIO_START_VALUE / len(coins_in_portfolio)
 			units =  np.divide(amt_each, prices)
@@ -24,7 +23,10 @@ class Portfolio(object):
 			date = hist_prices[0]
 		else:
 			# This is not a simulation.  Rebalance our own portfolio.
-			api = pd.read_csv('../api.csv')
+			try:
+				api = pd.read_csv('../../api.csv')
+			except:
+				api = pd.read_csv('../api.csv')
 			self.binance = ccxt.binance({'options': {'adjustForTimeDifference': True},
 			                        'apiKey': api['apiKey'][0],
 			                        'secret': api['secret'][0]})
@@ -34,17 +36,14 @@ class Portfolio(object):
 			# 		remains if we aren't able to perfectly sell/transfer 100% of the coin
 			# 2. This is based on units of coin owned: if we're rebalancing a coin
 			# 		priced at $1 million/coin, units will be less than 0.01
-			coins_in_portfolio = {coin: units
-					   for coin, units
-					   in coins_units_all.items()
-					   if units > 0.01}
-		   	hist_prices = None
-			coins_in_portfolio = coins_in_portfolio.keys()
-			units = coins_in_portfolio.values()
+			coins_in_portfolio = {coin: units for coin, units in coins_units_all.items() if units > 0.01 and coin != 'ENJ'}
+			hist_prices = None
+			coins = list(coins_in_portfolio.keys())
+			units = np.array(list(coins_in_portfolio.values()))
 			prices = [exchange.fetch_price(coin) for coin in coins_in_portfolio]
 			date = None
 
-		self.coins = coins_in_portfolio
+		self.coins = coins
 		self.hist_prices = hist_prices
 		self.units = units
 		self.prices = prices
