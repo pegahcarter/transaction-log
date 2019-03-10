@@ -5,6 +5,9 @@ import transactions
 api = ccxt.binance()
 all_tickers = list(api.fetch_tickers().keys())
 
+'BTC/ETH' in all_tickers
+all_tickers
+
 
 def fetch_price(coin, date=None):
 	''' Return the current dollar price of the coin in question '''
@@ -27,9 +30,9 @@ def trade(d_amt, portfolio, date=None):
 	# `l` == "lowest weight in portfolio", `h` == "highest weight in portfolio"
 	l_coin = portfolio.coins[portfolio.d_vals.argmin()]
 	h_coin= portfolio.coins[portfolio.d_vals.argmax()]
-	print('Value of trade: ${}'.format(round(d_amt,2)))
+	print('\nValue of trade: ${}'.format(round(d_amt,2)))
 	print('Sell: {}'.format(h_coin))
-	print('Buy: {}\n'.format(l_coin))
+	print('Buy: {}'.format(l_coin))
 
 	# See if ticker exists on exchange - TODO: obviously the ticker will already exist
 	# 	because the pair will already exist on the DEX
@@ -38,20 +41,18 @@ def trade(d_amt, portfolio, date=None):
 	t2 = h_coin + '/' + l_coin
 
 	#	NOTE: what do we do if the pair _does not_ exist on the DEX?
-	if t1 and t2 not in all_tickers:
-		tickers_to_trade = [[h_coin + '/BTC'], [l_coin + '/BTC']]
-		print('Coin ticker does not exist on exchange.  BTC used as base pair for both coins.')
+	if t1 in all_tickers:
+		trade_tickers = [t1]
+	elif t2 in all_tickers:
+		trade_tickers = [t2]
 	else:
-		convert_to_btc = False
-		if t1 in all_tickers:
-			tickers_to_trade = [t1]
-		else:
-			tickers_to_trade = [t2]
+		print('Coin ticker does not exist on exchange.  BTC used as base pair for both coins.')
+		trade_tickers = [h_coin + '/BTC', l_coin + '/BTC']
 
-	for ticker in tickers_to_trade:
+	for ticker in trade_tickers:
 		trade_coins = ticker.split('/')
-		trade_sides = findSides(ticker, portfolio)
-		trade_units = findUnits(ticker, d_amt)
+		trade_sides = fetch_sides(ticker, portfolio)
+		trade_units = fetch_units(ticker, d_amt)
 		if date is None:
 			portfolio.binance.create_order(ticker, 'market', trade_sides[0], trade_units[0])
 
@@ -60,7 +61,7 @@ def trade(d_amt, portfolio, date=None):
 	return
 
 
-def findSides(ticker, portfolio):
+def fetch_sides(ticker, portfolio):
 	'''
 	Return a tuple where the tuple[0] is the side of our trade and tuple[1]
 	is for documenting the other side of the trade
@@ -73,7 +74,7 @@ def findSides(ticker, portfolio):
 		return 'sell', 'buy'
 
 
-def findUnits(ticker, d_amt, date=None): # TODO: add @param for simulation
+def fetch_units(ticker, d_amt, date=None): # TODO: add @param for simulation
 
 	numerator, denominator = ticker.split('/')
 	return [d_amt/fetch_price(numerator, date), d_amt/fetch_price(denominator, date)]

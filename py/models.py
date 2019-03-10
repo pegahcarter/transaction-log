@@ -36,7 +36,7 @@ class Portfolio(object):
 			# 		remains if we aren't able to perfectly sell/transfer 100% of the coin
 			# 2. This is based on units of coin owned: if we're rebalancing a coin
 			# 		priced at $1 million/coin, units will be less than 0.01
-			coins_in_portfolio = {coin: units for coin, units in coins_units_all.items() if units > 0.01 and coin != 'ENJ'}
+			coins_in_portfolio = {coin: units for coin, units in coins_units_all.items() if units > 0.01 and coin != 'THETA' and coin != 'ENJ'}
 			hist_prices = None
 			coins = list(coins_in_portfolio.keys())
 			units = np.array(list(coins_in_portfolio.values()))
