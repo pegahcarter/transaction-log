@@ -3,10 +3,6 @@ import pandas as pd
 import transactions
 
 api = ccxt.binance()
-all_tickers = list(api.fetch_tickers().keys())
-
-'BTC/ETH' in all_tickers
-all_tickers
 
 
 def fetch_price(coin, date=None):
@@ -41,12 +37,12 @@ def trade(d_amt, portfolio, date=None):
 	t2 = h_coin + '/' + l_coin
 
 	#	NOTE: what do we do if the pair _does not_ exist on the DEX?
-	if t1 in all_tickers:
+	if t1 in api.fetch_tickers():
 		trade_tickers = [t1]
-	elif t2 in all_tickers:
+	elif t2 in api.fetch_tickers():
 		trade_tickers = [t2]
 	else:
-		print('Coin ticker does not exist on exchange.  BTC used as base pair for both coins.')
+		print('BTC used as base pair.')
 		trade_tickers = [h_coin + '/BTC', l_coin + '/BTC']
 
 	for ticker in trade_tickers:
