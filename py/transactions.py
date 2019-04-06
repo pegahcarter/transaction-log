@@ -1,6 +1,6 @@
-import exchange
 import time
 import pandas as pd
+import exchange
 import models
 
 hist_prices = pd.read_csv('../data/historical/prices.csv')
@@ -25,71 +25,56 @@ def initialize(PORTFOLIO_START_VALUE=None, coins=None):
         if df.empty or coin not in set(df['coin']):
             add_coin(coin, units, PORTFOLIO_START_VALUE)
 
-    return
-
 
 def add_coin(coin, units, PORTFOLIO_START_VALUE=None):
     ''' Add initial purchase of coin to transactions table '''
 
-    if PORTFOLIO_START_VALUE is None:
-        date = time.time()
-        price = exchange.fetch_price(coin)
-    else:
-        date = START_DATE
-        price = hist_prices[coin][0]
-
+    date = time.time()
+    price = exchange.fetch_price(coin)
+    # NOTE: if we were running a simulation, we'd want to define the variables different:
+    #     date = START_DATE
+    #     price = hist_prices[coin][0]
     df = pd.read_csv(TRANSACTIONS_FILE)
-    df = df.append({'date': date,
-                    'coin': coin,
-                    'side': 'buy',
-                    'units': units,
-                    'price_per_unit': price,
-                    'fees': price * units * 0.00075,
-                    'prev_units': 0,
-                    'cum_units': units,
-                    'tx_val': price * units,
-                    'prev_cost': 0,
-                    'cum_cost': price * units,
-                    'gain_loss': 0}, ignore_index=True)
+    row = {'date': date,
+           'coin': coin,
+           'side': 'buy',
+           'units': units,
+           'price_per_unit': price,
+           'fees': price * units * 0.00075,
+           'prev_units': 0,
+           'cum_units': units,
+           'tx_val': price * units,
+           'prev_cost': 0,
+           'cum_cost': price * units,
+           'gain_loss': 0}
 
+    df = df.append(row, ignore_index=True)
     df.to_csv(TRANSACTIONS_FILE, index=False)
 
 
-def update(trade_coins, trade_sides, trade_units, d_amt, date=None, current_price=None):
-    '''
-    Document transaction data to CSV
-
-    coin            - coin we're documenting for the trade
-    side            - side we're executing the trade on (buy or sell)
-    units       - units of coin to be traded
-    d_amt           - value of our trade in dollars
-    '''
+def update(trade_coins, trade_sides, trade_units, trade_usd_value, date=None,
+           current_price=None, tx_cost_per_unit=None, tx_cost=None, gain_loss=None,
+           realised_pct=None, fees=None):
+    ''' Document transaction data to CSV '''
 
     for coin, side, units in zip(trade_coins, trade_sides, trade_units):
-
+        df = pd.read_csv(TRANSACTIONS_FILE)
+        prev_units = df[df['coin'] == coin]['cum_units'].iloc[-1]
+        prev_cost = df[df['coin'] == coin]['cum_cost'].iloc[-1]
         if date is None:
             date = time.time()
             current_price = exchange.fetch_price(coin)
 
-        df = pd.read_csv(TRANSACTIONS_FILE)
-        prev_units = df[df['coin'] == coin]['cum_units'].iloc[-1]
-        prev_cost = df[df['coin'] == coin]['cum_cost'].iloc[-1]
-
         if side == 'buy':
-            fees = d_amt * 0.00075
+            fees = trade_usd_value * 0.00075
             cum_units = prev_units + units
-            tx_cost_per_unit = None
-            tx_cost = None
-            cum_cost = prev_cost + d_amt
-            gain_loss = None
-            realised_pct = None
+            cum_cost = prev_cost + trade_usd_value
         else:
-            fees = None
             cum_units = prev_units - units
             tx_cost_per_unit = prev_cost / prev_units
             tx_cost = units / prev_units * prev_cost
-            cum_cost = prev_cost - d_amt
-            gain_loss = d_amt - tx_cost
+            cum_cost = prev_cost - trade_usd_value
+            gain_loss = trade_usd_value - tx_cost
             realised_pct = gain_loss / tx_cost
 
         df = df.append({'date': date,

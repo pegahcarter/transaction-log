@@ -6,23 +6,22 @@ import exchange
 
 
 class Portfolio(object):
-	'''
-	Represents our account balance on Binance
-	coins	- list of coin names we are invested in
-	units	- list of the units for each coin held
-	prices 	- list of the most recent dollar price for each coin held
-	d_vals  - list of the dollar values for each coin held (units * prices)
-	'''
+	'''	Represents our account balance on Binance '''
 
 	def __init__(self, coins=None, PORTFOLIO_START_VALUE=None):
-		if PORTFOLIO_START_VALUE is not None:
-			hist_prices = pd.read_csv()[['timestamp'] + coins_in_portfolio]
-			amt_each = PORTFOLIO_START_VALUE / len(coins_in_portfolio)
-			units =  np.divide(amt_each, prices)
-			prices = hist_prices[coins_in_portfolio].iloc[0]
-			date = hist_prices[0]
-		else:
-			# This is not a simulation.  Rebalance our own portfolio.
+		if PORTFOLIO_START_VALUE:
+			pass
+			# hist_prices = pd.read_csv()[['timestamp'] + coins_in_portfolio]
+			# amt_each = PORTFOLIO_START_VALUE / len(coins_in_portfolio)
+			# units =  np.divide(amt_each, prices)
+			# prices = hist_prices[coins_in_portfolio].iloc[0]
+			# date = hist_prices[0]
+		else: # This is not a simulation.  Rebalance our own portfolio.
+			coins = []
+			units = []
+			prices = []
+			hist_prices = None
+			date = None
 			try:
 				api = pd.read_csv('../../api.csv')
 			except:
@@ -31,21 +30,18 @@ class Portfolio(object):
 			                        'apiKey': api['apiKey'][0],
 			                        'secret': api['secret'][0]})
 
-			coins_units_all = self.binance.fetchBalance()['free']
-			# 1. Ignore "coin dust", i.e. the small fraction of coin that sometimes
-			# 		remains if we aren't able to perfectly sell/transfer 100% of the coin
-			# 2. This is based on units of coin owned: if we're rebalancing a coin
-			# 		priced at $1 million/coin, units will be less than 0.01
-			coins_in_portfolio = {coin: units for coin, units in coins_units_all.items() if units > 0.01 and coin != 'THETA' and coin != 'ENJ'}
-			hist_prices = None
-			coins = list(coins_in_portfolio.keys())
-			units = np.array(list(coins_in_portfolio.values()))
-			prices = [exchange.fetch_price(coin) for coin in coins_in_portfolio]
-			date = None
+			all_coins_and_units = self.binance.fetchBalance()['free']
+			for coin, coin_units in all_coins_and_units.items():
+				# TODO: use BTC price on exchange instead of coin units
+				if coin == 'USDT' and coin_units > 200 \
+				or coin not in ['TFUEL', 'USDT'] and coin_units > 0.001:
+					coins.append(coin)
+					units.append(coin_units)
+					prices.append(exchange.fetch_price(coin))
 
 		self.coins = coins
 		self.hist_prices = hist_prices
 		self.units = units
 		self.prices = prices
 		self.date = date
-		self.d_vals = units * prices
+		self.usd_values = np.multiply(units, prices)
