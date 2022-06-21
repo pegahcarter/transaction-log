@@ -14,7 +14,7 @@ itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.0
 multidict==4.5.2
-numpy==1.16.1
+numpy==1.22.0
 pandas==0.24.1
 pathlib==1.0.1
 pycares==2.4.0
